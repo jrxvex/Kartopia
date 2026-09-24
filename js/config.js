@@ -13,6 +13,7 @@ export const PHYSICS = {
   KART_RADIUS: 1.0,
   KART_HEIGHT: 1.5,
   STEP_UP: 0.55, // escalón máximo que el kart puede subir sin chocar
+  STEP_UP_AIR: 1.3, // al caer de un salto se puede 'enganchar' un borde plano hasta esta altura
   BLOCK_HEIGHT: 2.8, // por encima de esto una superficie se considera "techo" (puente)
   SNAP_DOWN: 0.6, // distancia máxima para mantenerse pegado al suelo
 

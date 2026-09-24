@@ -91,6 +91,8 @@ export class MaterialLibrary {
           return new THREE.MeshStandardMaterial({ map: TextureFactory.rock(this.theme.rockColor || '#8a8278'), roughness: 1, flatShading: true });
         case 'ice':
           return new THREE.MeshStandardMaterial({ color: '#cdefff', roughness: 0.1, metalness: 0.1, transparent: true, opacity: 0.8 });
+        case 'snow':
+          return new THREE.MeshStandardMaterial({ color: '#f3f8fd', map: TextureFactory.detail('snow'), roughness: 0.92 });
         case 'lava':
           return new THREE.MeshStandardMaterial({ map: TextureFactory.bricks('#3e2a28', '#1a0f0e'), roughness: 0.9, emissive: new THREE.Color('#ff5722'), emissiveIntensity: 0.12 });
         case 'tire':

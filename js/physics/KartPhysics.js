@@ -430,7 +430,10 @@ export function stepKart(k, dt, ctx) {
   const world = ctx.world;
   const wasGrounded = k.grounded;
   world.groundAt(k.pos.x, k.pos.z, k.pos.y + P.BLOCK_HEIGHT, g);
-  if (g.hit && g.y > k.pos.y + P.STEP_UP) {
+  // Ayuda de borde: al caer de un salto, un kart que llega justo por debajo del borde de una
+  // superficie plana se sube a ella en lugar de rebotar y caer al vacío.
+  const ledge = !wasGrounded && k.vel.y < 0 && g.hit && g.ny > 0.85 ? P.STEP_UP_AIR : P.STEP_UP;
+  if (g.hit && g.y > k.pos.y + ledge) {
     // Escalón demasiado alto: se comporta como una pared.
     const mx = k.pos.x - k.prevPos.x;
     const mz = k.pos.z - k.prevPos.z;

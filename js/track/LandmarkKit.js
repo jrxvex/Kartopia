@@ -510,6 +510,7 @@ export class LandmarkKit {
     const span = tr.forwardDistance(s0, tr.sAtU(u1));
     const thick = opts.thickness ?? 5;
     const height = opts.height ?? 12;
+    const roofY = opts.roofY ?? 8.2;
     const step = 6;
     const boxes = [];
     let maxHW = 0;
@@ -523,7 +524,7 @@ export class LandmarkKit {
         const p = tr.pointAt(s, side * (inner + thick / 2));
         boxes.push({ x: p.x, y: c.y - 1, z: p.z, w: thick, h: height + 1, d: step + 0.6, rot });
       }
-      boxes.push({ x: c.x, y: c.y + 8.2, z: c.z, w: inner * 2 + thick * 2, h: height - 8.2 + 0.8, d: step + 0.6, rot });
+      boxes.push({ x: c.x, y: c.y + roofY, z: c.z, w: inner * 2 + thick * 2, h: Math.max(1.2, height - roofY + 0.8), d: step + 0.6, rot });
     }
     // Portadas
     const fronts = [];

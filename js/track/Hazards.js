@@ -493,8 +493,15 @@ class FirebarHazard extends Hazard {
     this.phase = p.phase ?? 0;
     this.balls = [];
     for (let k = 0; k < this.count; k++) {
-      this.balls.push({ x: 0, z: 0, c: this.addCollider(0.6, 'tumble', 'fire') });
+      // bolas "blandas": derriban al kart sin arrastrarlo (no lo empujan fuera de la pasarela)
+      this.balls.push({ x: 0, z: 0, c: this.addCollider(0.6, 'tumble', 'fire', true) });
     }
+    // poste central sólido (sin golpe)
+    const post = this.addCollider(0.8, null, 'post');
+    post.x = this.center.x;
+    post.z = this.center.z;
+    post.y0 = this.center.y - 0.5;
+    post.y1 = this.center.y + 1.8;
     this.angle = 0;
     this.update(0);
   }
