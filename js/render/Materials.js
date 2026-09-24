@@ -44,7 +44,7 @@ export class MaterialLibrary {
       if (style === 'neon') {
         params.emissive = new THREE.Color('#ffffff');
         params.emissiveMap = TextureFactory.roadEmissive(t.neonLine || '#00e5ff');
-        params.emissiveIntensity = 2.2;
+        params.emissiveIntensity = 1.3;
       }
       if (style === 'asphalt' && t.wet) {
         params.roughness = 0.38;
