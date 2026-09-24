@@ -240,6 +240,11 @@ export class InputManager {
     if (this.isDown('left')) s -= 1;
     if (this.isDown('right')) s += 1;
     if (s === 0 && this.padAxes[0] !== 0) s = this.padAxes[0];
+    if (s === 0 && this.padButtons) {
+      // cruceta del mando
+      if (this.padButtons[14]) s -= 1;
+      if (this.padButtons[15]) s += 1;
+    }
     return s;
   }
 
