@@ -1,0 +1,73 @@
+{
+  "presets": {
+    "easy": {
+      "name": "Fácil",
+      "cc": "50cc",
+      "engine": 0.8,
+      "ai": {
+        "speed": 0.9,
+        "accel": 0.9,
+        "mistakeRate": 0.12,
+        "driftSkill": 0.25,
+        "maxDriftLevel": 1,
+        "itemSkill": 0.35,
+        "rubberBand": 0.06,
+        "lineNoise": 1.6,
+        "startBoostChance": 0.1,
+        "spread": 0.05
+      }
+    },
+    "normal": {
+      "name": "Normal",
+      "cc": "100cc",
+      "engine": 0.9,
+      "ai": {
+        "speed": 0.955,
+        "accel": 0.96,
+        "mistakeRate": 0.06,
+        "driftSkill": 0.55,
+        "maxDriftLevel": 2,
+        "itemSkill": 0.6,
+        "rubberBand": 0.05,
+        "lineNoise": 1.0,
+        "startBoostChance": 0.3,
+        "spread": 0.04
+      }
+    },
+    "hard": {
+      "name": "Difícil",
+      "cc": "150cc",
+      "engine": 1.0,
+      "ai": {
+        "speed": 0.995,
+        "accel": 1.0,
+        "mistakeRate": 0.025,
+        "driftSkill": 0.8,
+        "maxDriftLevel": 2,
+        "itemSkill": 0.85,
+        "rubberBand": 0.045,
+        "lineNoise": 0.6,
+        "startBoostChance": 0.55,
+        "spread": 0.03
+      }
+    },
+    "expert": {
+      "name": "Experto",
+      "cc": "200cc",
+      "engine": 1.12,
+      "ai": {
+        "speed": 1.015,
+        "accel": 1.03,
+        "mistakeRate": 0.01,
+        "driftSkill": 1.0,
+        "maxDriftLevel": 3,
+        "itemSkill": 1.0,
+        "rubberBand": 0.04,
+        "lineNoise": 0.35,
+        "startBoostChance": 0.8,
+        "spread": 0.02
+      }
+    }
+  },
+  "timeTrialDifficulty": "hard"
+}

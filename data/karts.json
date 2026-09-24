@@ -1,0 +1,60 @@
+{
+  "karts": [
+    {
+      "id": "standard",
+      "name": "Estándar",
+      "body": "standard",
+      "description": "El clásico de siempre: equilibrado en todo.",
+      "stats": { "speed": 0, "accel": 0, "weight": 0, "handling": 0, "traction": 0, "miniTurbo": 0 }
+    },
+    {
+      "id": "bullet",
+      "name": "Bala",
+      "body": "speedster",
+      "description": "Aerodinámico y rapidísimo en recta, pero cuesta girarlo.",
+      "stats": { "speed": 2, "accel": -1, "weight": 0, "handling": -1, "traction": -1, "miniTurbo": -1 }
+    },
+    {
+      "id": "buggy",
+      "name": "Buggy",
+      "body": "buggy",
+      "description": "Ruedas de tacos: ideal para atajos y tierra.",
+      "stats": { "speed": -1, "accel": 1, "weight": 0, "handling": 0, "traction": 3, "miniTurbo": 1 }
+    },
+    {
+      "id": "tank",
+      "name": "Titán",
+      "body": "tank",
+      "description": "Blindado y pesado. Empuja a cualquiera.",
+      "stats": { "speed": 1, "accel": -2, "weight": 3, "handling": -1, "traction": 1, "miniTurbo": -1 }
+    },
+    {
+      "id": "feather",
+      "name": "Pluma",
+      "body": "feather",
+      "description": "Ligerísimo: aceleración y manejo de primera.",
+      "stats": { "speed": -1, "accel": 2, "weight": -2, "handling": 2, "traction": 0, "miniTurbo": 1 }
+    },
+    {
+      "id": "retro",
+      "name": "Retro",
+      "body": "retro",
+      "description": "Estilo años 50 con unos mini-turbos brutales.",
+      "stats": { "speed": 0, "accel": 0, "weight": 1, "handling": 1, "traction": -1, "miniTurbo": 2 }
+    },
+    {
+      "id": "comet",
+      "name": "Cometa",
+      "body": "sport",
+      "description": "Deportivo futurista, veloz y preciso en asfalto.",
+      "stats": { "speed": 1, "accel": 0, "weight": -1, "handling": 1, "traction": -2, "miniTurbo": 1 }
+    },
+    {
+      "id": "tub",
+      "name": "Bañera",
+      "body": "tub",
+      "description": "¿Una bañera con ruedas? Sorprendentemente estable.",
+      "stats": { "speed": -1, "accel": 1, "weight": 1, "handling": 0, "traction": 2, "miniTurbo": 0 }
+    }
+  ]
+}

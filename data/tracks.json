@@ -1,0 +1,113 @@
+{
+  "cups": [
+    {
+      "id": "leaf",
+      "name": "Copa Hoja",
+      "color": "#43a047",
+      "tracks": ["green-valley", "desert-ruins", "ocean-resort", "forest-temple"]
+    },
+    {
+      "id": "thunder",
+      "name": "Copa Rayo",
+      "color": "#f9a825",
+      "tracks": ["neon-city", "sky-mountain", "lava-castle", "cyber-circuit"]
+    },
+    {
+      "id": "supreme",
+      "name": "Copa Suprema",
+      "color": "#8e24aa",
+      "tracks": [
+        "green-valley",
+        "neon-city",
+        "desert-ruins",
+        "sky-mountain",
+        "ocean-resort",
+        "lava-castle",
+        "cyber-circuit",
+        "forest-temple"
+      ]
+    }
+  ],
+  "tracks": [
+    {
+      "id": "green-valley",
+      "name": "Valle Verde",
+      "module": "greenValley.js",
+      "description": "Colinas suaves, un río con puente de madera y molinos de viento. Ideal para empezar.",
+      "difficulty": 1,
+      "color": "#4caf50",
+      "accent": "#8bc34a",
+      "music": "greenValley"
+    },
+    {
+      "id": "neon-city",
+      "name": "Ciudad Neón",
+      "module": "neonCity.js",
+      "description": "Avenidas nocturnas iluminadas, un paso elevado en forma de ocho y tráfico peligroso.",
+      "difficulty": 2,
+      "color": "#e040fb",
+      "accent": "#00e5ff",
+      "music": "neonCity"
+    },
+    {
+      "id": "desert-ruins",
+      "name": "Ruinas del Desierto",
+      "module": "desertRuins.js",
+      "description": "Dunas, un cañón estrecho, columnas milenarias y un gran salto sobre el abismo.",
+      "difficulty": 2,
+      "color": "#ffb300",
+      "accent": "#ff7043",
+      "music": "desertRuins"
+    },
+    {
+      "id": "sky-mountain",
+      "name": "Montaña Celeste",
+      "module": "skyMountain.js",
+      "description": "Sube por curvas de herradura nevadas y baja a toda velocidad junto al precipicio.",
+      "difficulty": 3,
+      "color": "#81d4fa",
+      "accent": "#ffffff",
+      "music": "skyMountain"
+    },
+    {
+      "id": "ocean-resort",
+      "name": "Resort Oceánico",
+      "module": "oceanResort.js",
+      "description": "Playas al atardecer, pasarelas de madera, agua poco profunda y un faro.",
+      "difficulty": 2,
+      "color": "#26c6da",
+      "accent": "#ff8a65",
+      "music": "oceanResort"
+    },
+    {
+      "id": "lava-castle",
+      "name": "Castillo de Lava",
+      "module": "lavaCastle.js",
+      "description": "Puentes sin barandilla sobre ríos de lava y apisonadoras dentro de la fortaleza.",
+      "difficulty": 3,
+      "color": "#e53935",
+      "accent": "#ff9800",
+      "music": "lavaCastle"
+    },
+    {
+      "id": "cyber-circuit",
+      "name": "Circuito Cibernético",
+      "module": "cyberCircuit.js",
+      "description": "Pista flotante en el vacío digital con peraltes, saltos y paneles turbo.",
+      "difficulty": 3,
+      "color": "#00e5ff",
+      "accent": "#651fff",
+      "music": "cyberCircuit"
+    },
+    {
+      "id": "forest-temple",
+      "name": "Templo del Bosque",
+      "module": "forestTemple.js",
+      "description": "Selva frondosa, puentes colgantes, troncos oscilantes y un templo ancestral.",
+      "difficulty": 3,
+      "color": "#2e7d32",
+      "accent": "#c0ca33",
+      "music": "forestTemple"
+    }
+  ]
+}

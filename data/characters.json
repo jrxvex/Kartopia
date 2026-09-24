@@ -1,0 +1,104 @@
+{
+  "characters": [
+    {
+      "id": "blaze",
+      "name": "Blaze",
+      "species": "fox",
+      "weightClass": "Medio",
+      "description": "Zorro temerario que vive a toda velocidad. Equilibrado y fiable.",
+      "colors": { "fur": "#ff7a1a", "light": "#fff4e6", "outfit": "#2f5bd8", "accent": "#ffd23f", "eyes": "#3b2412" },
+      "stats": { "speed": 5, "accel": 5, "weight": 5, "handling": 5, "traction": 5, "miniTurbo": 5 },
+      "enginePitch": 1.0
+    },
+    {
+      "id": "pip",
+      "name": "Pip",
+      "species": "penguin",
+      "weightClass": "Ligero",
+      "description": "Pingüino ágil de reflejos rápidos. Gran aceleración y minis turbo.",
+      "colors": { "fur": "#1f2a44", "light": "#ffffff", "outfit": "#e63946", "accent": "#ffb020", "eyes": "#111111" },
+      "stats": { "speed": 3, "accel": 7, "weight": 3, "handling": 7, "traction": 5, "miniTurbo": 7 },
+      "enginePitch": 1.25
+    },
+    {
+      "id": "bruno",
+      "name": "Bruno",
+      "species": "bear",
+      "weightClass": "Pesado",
+      "description": "Oso grandullón y bonachón. Difícil de empujar, gran velocidad punta.",
+      "colors": { "fur": "#8b5a2b", "light": "#e0bf94", "outfit": "#2e8b57", "accent": "#f4d35e", "eyes": "#1d130a" },
+      "stats": { "speed": 7, "accel": 3, "weight": 8, "handling": 3, "traction": 5, "miniTurbo": 3 },
+      "enginePitch": 0.82
+    },
+    {
+      "id": "mika",
+      "name": "Mika",
+      "species": "cat",
+      "weightClass": "Ligero",
+      "description": "Gata acróbata con el mejor manejo del paddock.",
+      "colors": { "fur": "#f3eefc", "light": "#ffffff", "outfit": "#ff5fa2", "accent": "#7fe7ff", "eyes": "#2a6b3a" },
+      "stats": { "speed": 3, "accel": 7, "weight": 2, "handling": 8, "traction": 4, "miniTurbo": 7 },
+      "enginePitch": 1.3
+    },
+    {
+      "id": "rexo",
+      "name": "Rexo",
+      "species": "dino",
+      "weightClass": "Pesado",
+      "description": "Dinosaurio imparable. Máxima velocidad y peso, poca aceleración.",
+      "colors": { "fur": "#4caf50", "light": "#d6f5a3", "outfit": "#ff5722", "accent": "#2e7d32", "eyes": "#1a1a1a" },
+      "stats": { "speed": 8, "accel": 2, "weight": 9, "handling": 3, "traction": 5, "miniTurbo": 2 },
+      "enginePitch": 0.75
+    },
+    {
+      "id": "luna",
+      "name": "Luna",
+      "species": "bunny",
+      "weightClass": "Ligero",
+      "description": "Coneja soñadora con gran agarre en cualquier superficie.",
+      "colors": { "fur": "#ffffff", "light": "#ffc2d4", "outfit": "#7c4dff", "accent": "#ffe066", "eyes": "#5b2a86" },
+      "stats": { "speed": 4, "accel": 6, "weight": 4, "handling": 6, "traction": 6, "miniTurbo": 6 },
+      "enginePitch": 1.18
+    },
+    {
+      "id": "tobo",
+      "name": "Tobo",
+      "species": "frog",
+      "weightClass": "Medio",
+      "description": "Rana todoterreno. Brilla fuera de la pista.",
+      "colors": { "fur": "#7bd33a", "light": "#f0fbc8", "outfit": "#1e88e5", "accent": "#ffca28", "eyes": "#111111" },
+      "stats": { "speed": 5, "accel": 5, "weight": 5, "handling": 6, "traction": 8, "miniTurbo": 4 },
+      "enginePitch": 1.05
+    },
+    {
+      "id": "volt",
+      "name": "Volt",
+      "species": "robot",
+      "weightClass": "Pesado",
+      "description": "Robot de carreras calibrado para la velocidad pura.",
+      "colors": { "fur": "#b8c4cc", "light": "#eceff1", "outfit": "#37474f", "accent": "#00e5ff", "eyes": "#00e5ff" },
+      "stats": { "speed": 6, "accel": 4, "weight": 7, "handling": 4, "traction": 5, "miniTurbo": 4 },
+      "enginePitch": 0.9
+    },
+    {
+      "id": "nova",
+      "name": "Nova",
+      "species": "alien",
+      "weightClass": "Medio",
+      "description": "Visitante de otra galaxia. Aceleración y derrapes cósmicos.",
+      "colors": { "fur": "#9b5de5", "light": "#d9c2ff", "outfit": "#00bbf9", "accent": "#f15bb5", "eyes": "#0b0b18" },
+      "stats": { "speed": 5, "accel": 6, "weight": 4, "handling": 6, "traction": 3, "miniTurbo": 7 },
+      "enginePitch": 1.12
+    },
+    {
+      "id": "koko",
+      "name": "Koko",
+      "species": "monkey",
+      "weightClass": "Ligero",
+      "description": "Mono travieso, rapidísimo en las curvas cerradas.",
+      "colors": { "fur": "#7a4a2e", "light": "#f1c9a5", "outfit": "#ffca28", "accent": "#e53935", "eyes": "#1d130a" },
+      "stats": { "speed": 4, "accel": 6, "weight": 4, "handling": 7, "traction": 5, "miniTurbo": 6 },
+      "enginePitch": 1.15
+    }
+  ]
+}

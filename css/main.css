@@ -1,0 +1,277 @@
+/* Estilos base: fuentes, variables, capas principales, pantalla de arranque y avisos. */
+
+@font-face {
+  font-family: 'Lilita One';
+  src: url('../assets/fonts/LilitaOne-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Lilita One';
+  src: url('../assets/fonts/LilitaOne-latin-ext.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0100-024F, U+1E00-1EFF;
+}
+@font-face {
+  font-family: 'Nunito';
+  src: url('../assets/fonts/Nunito-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Nunito';
+  src: url('../assets/fonts/Nunito-700.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Nunito';
+  src: url('../assets/fonts/Nunito-800.woff2') format('woff2');
+  font-weight: 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Nunito';
+  src: url('../assets/fonts/Nunito-900.woff2') format('woff2');
+  font-weight: 900;
+  font-display: swap;
+}
+
+:root {
+  --c-bg: #1a1147;
+  --c-bg2: #2a1a6e;
+  --c-panel: rgba(18, 10, 58, 0.78);
+  --c-panel-solid: #1f1452;
+  --c-line: rgba(255, 255, 255, 0.14);
+  --c-primary: #ff4fd8;
+  --c-primary2: #b44dff;
+  --c-gold: #ffd740;
+  --c-blue: #29b6f6;
+  --c-green: #69f0ae;
+  --c-red: #ff5252;
+  --c-text: #ffffff;
+  --c-muted: rgba(255, 255, 255, 0.72);
+  --font-display: 'Lilita One', 'Arial Black', 'Trebuchet MS', sans-serif;
+  --font-body: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+  --radius: 18px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --outline: 0 2px 0 #1a0b3a, 2px 0 0 #1a0b3a, -2px 0 0 #1a0b3a, 0 -2px 0 #1a0b3a, 2px 2px 0 #1a0b3a, -2px 2px 0 #1a0b3a, 2px -2px 0 #1a0b3a, -2px -2px 0 #1a0b3a;
+  --hud-scale: 1;
+  /* zona segura para pantallas ultrapanorámicas: máximo 21:9 */
+  --safe-w: min(100vw, calc(100vh * 2.4));
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-body);
+  font-size: clamp(13px, 0.52vw + 0.55vh, 22px);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+#game-canvas,
+#fx-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#fx-canvas {
+  pointer-events: none;
+  z-index: 2;
+}
+
+#flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3), rgba(255, 60, 60, 0.55));
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+#ui-root {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+#ui-root > * {
+  pointer-events: auto;
+}
+
+.hidden {
+  display: none !important;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+kbd {
+  display: inline-block;
+  min-width: 1.8em;
+  padding: 0.1em 0.5em;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-bottom-width: 3px;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+.small {
+  font-size: 0.85em;
+  color: var(--c-muted);
+}
+
+.good {
+  color: var(--c-green);
+}
+
+/* --------------------------------------------------------------- Arranque */
+.boot {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.4rem;
+  background: radial-gradient(ellipse at 50% 40%, #3a2296 0%, #1a1147 60%, #0d0826 100%);
+  transition: opacity 0.6s;
+}
+
+.boot-hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.boot-logo {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 9vw, 150px);
+  letter-spacing: 0.04em;
+  background: linear-gradient(180deg, #fff59d 0%, #ffd740 45%, #ff6d00 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 6px 0 #6a1b9a) drop-shadow(0 12px 18px rgba(0, 0, 0, 0.5));
+}
+
+.boot-bar {
+  width: min(420px, 70vw);
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+}
+
+.boot-bar-fill {
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--c-primary), var(--c-gold));
+  transition: width 0.25s;
+}
+
+.boot-text {
+  font-weight: 800;
+  color: var(--c-muted);
+  text-align: center;
+  max-width: 80vw;
+}
+
+.boot-error {
+  color: #ffcdd2;
+}
+
+.fade {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 90;
+}
+
+#fps {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  z-index: 60;
+  font: 700 12px/1 var(--font-body);
+  color: #b9f6ca;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 8px;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+#toast-root {
+  position: absolute;
+  top: 3vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--c-panel-solid);
+  border: 2px solid var(--c-primary);
+  padding: 0.6em 1.2em;
+  border-radius: 999px;
+  font-weight: 800;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: none;
+}
+
+.noscript {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: 700 20px sans-serif;
+  color: #fff;
+  background: #1a1147;
+  padding: 2em;
+  text-align: center;
+}

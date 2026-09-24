@@ -1,0 +1,477 @@
+{
+  "songs": {
+    "menu": {
+      "bpm": 124,
+      "swing": 0.04,
+      "drums": "pop",
+      "bassStyle": "octave",
+      "arpStyle": "up16",
+      "pad": true,
+      "instruments": {
+        "lead": { "wave": "pulse25", "vol": 0.1, "vibrato": 1, "delay": 0.18 },
+        "bass": { "wave": "sawtooth", "vol": 0.15, "cutoff": 900 },
+        "pad": { "wave": "sawtooth", "vol": 0.035, "cutoff": 1300 },
+        "arp": { "wave": "triangle", "vol": 0.035 }
+      },
+      "sections": {
+        "I": { "chords": ["C", "Am", "F", "G"], "lead": null, "drums": "halftime" },
+        "A": {
+          "chords": ["C", "Am", "F", "G", "C", "Am", "F", "G"],
+          "lead": [
+            "E5 . G5 . C6 - B5 A5",
+            "G5 - E5 - - . C5 D5",
+            "E5 . F5 . A5 - G5 F5",
+            "E5 - D5 - - . . .",
+            "E5 . G5 . C6 - D6 C6",
+            "B5 - A5 - E5 . A5 B5",
+            "C6 . A5 . F5 . G5 A5",
+            "G5 - - - - . . ."
+          ]
+        },
+        "B": {
+          "chords": ["F", "G", "Em", "Am", "F", "G", "C", "C"],
+          "lead": [
+            "A5 . A5 . A5 G5 F5 E5",
+            "D5 . G5 - - . G5 A5",
+            "B5 . B5 . B5 A5 G5 F#5",
+            "E5 - A5 - - . A5 B5",
+            "C6 . C6 . A5 . F5 A5",
+            "B5 . B5 . G5 . D5 G5",
+            "C6 - - . G5 . E5 G5",
+            "C6 - - - - . . ."
+          ]
+        }
+      },
+      "order": ["I", "A", "B", "A", "B"],
+      "loopFrom": 1
+    },
+    "greenValley": {
+      "bpm": 136,
+      "swing": 0.06,
+      "drums": "pop",
+      "bassStyle": "walk",
+      "arpStyle": "broken",
+      "pad": false,
+      "instruments": {
+        "lead": { "wave": "pulse25", "vol": 0.1, "vibrato": 0.8, "delay": 0.12 },
+        "bass": { "wave": "triangle", "vol": 0.22, "cutoff": 1400 },
+        "arp": { "wave": "marimba", "vol": 0.05 }
+      },
+      "sections": {
+        "I": { "chords": ["G", "C", "D", "D"], "lead": null },
+        "A": {
+          "chords": ["G", "C", "G", "D", "G", "C", "D", "G"],
+          "lead": [
+            "D5 . G5 . B5 . A5 G5",
+            "E5 - G5 - - . E5 D5",
+            "D5 . G5 . B5 . D6 B5",
+            "A5 - - . F#5 . E5 D5",
+            "D5 . G5 . B5 . A5 G5",
+            "E5 - G5 - C6 - B5 A5",
+            "F#5 . A5 . D6 . C6 A5",
+            "G5 - - - - . D5 E5"
+          ]
+        },
+        "B": {
+          "chords": ["Em", "C", "G", "D", "Em", "C", "Am", "D"],
+          "lead": [
+            "G5 . G5 . F#5 . E5 F#5",
+            "G5 - E5 - - . C5 D5",
+            "B4 . D5 . G5 . B5 A5",
+            "A5 - F#5 - - . D5 E5",
+            "G5 . B5 . E6 - D6 B5",
+            "C6 - G5 - E5 . G5 C6",
+            "B5 . A5 . G5 . E5 G5",
+            "A5 - - - D6 - C6 A5"
+          ]
+        }
+      },
+      "order": ["I", "A", "B", "A", "B"],
+      "loopFrom": 1
+    },
+    "neonCity": {
+      "bpm": 116,
+      "swing": 0,
+      "drums": "disco",
+      "bassStyle": "octave",
+      "arpStyle": "up16",
+      "pad": true,
+      "instruments": {
+        "lead": { "wave": "sawtooth", "vol": 0.075, "vibrato": 0.6, "detune": 12, "filter": 2600, "delay": 0.3 },
+        "bass": { "wave": "sawtooth", "vol": 0.17, "cutoff": 700 },
+        "pad": { "wave": "sawtooth", "vol": 0.04, "cutoff": 1100, "attack": 0.4 },
+        "arp": { "wave": "square", "vol": 0.022 }
+      },
+      "sections": {
+        "I": { "chords": ["Am", "F", "C", "E"], "lead": null, "drums": "halftime" },
+        "A": {
+          "chords": ["Am", "F", "C", "G", "Am", "F", "C", "E"],
+          "lead": [
+            "A4 . C5 . E5 - D5 C5",
+            "C5 - A4 - - . . F4",
+            "G4 . C5 . E5 - G5 E5",
+            "D5 - - - B4 . . .",
+            "A4 . C5 . E5 - A5 G5",
+            "F5 - E5 - C5 . A4 C5",
+            "E5 . G5 . C6 . B5 G5",
+            "G#5 - - - E5 - - ."
+          ]
+        },
+        "B": {
+          "chords": ["F", "G", "Am", "Am", "F", "G", "E", "E"],
+          "lead": [
+            "A5 - - . G5 . F5 E5",
+            "D5 - - . E5 . G5 .",
+            "E5 - - . D5 . C5 B4",
+            "A4 - - - - . . .",
+            "C5 . F5 . A5 . C6 A5",
+            "B5 . G5 . D5 . B4 D5",
+            "E5 . G#5 . B5 . D6 B5",
+            "G#5 - - - - . . ."
+          ]
+        }
+      },
+      "order": ["I", "A", "B", "A", "B"],
+      "loopFrom": 1
+    },
+    "desertRuins": {
+      "bpm": 130,
+      "swing": 0.05,
+      "drums": "latin",
+      "bassStyle": "pump",
+      "arpStyle": "broken",
+      "pad": true,
+      "instruments": {
+        "lead": { "wave": "sawtooth", "vol": 0.075, "vibrato": 1.6, "filter": 2200, "delay": 0.15 },
+        "bass": { "wave": "square", "vol": 0.12, "cutoff": 700 },
+        "pad": { "wave": "triangle", "vol": 0.05, "cutoff": 1600 },
+        "arp": { "wave": "fm-bell", "vol": 0.04 }
+      },
+      "sections": {
+        "I": { "chords": ["E", "F", "E", "E"], "lead": null, "drums": "tribal" },
+        "A": {
+          "chords": ["E", "F", "E", "Dm", "E", "F", "G", "E"],
+          "lead": [
+            "E5 F5 G#5 . A5 . G#5 F5",
+            "E5 - - . F5 . E5 D5",
+            "E5 F5 G#5 . B5 . A5 G#5",
+            "A5 - - . F5 . D5 E5",
+            "E5 . B4 . E5 F5 G#5 A5",
+            "C6 - B5 A5 G#5 - F5 E5",
+            "D5 . F5 . G5 . F5 D5",
+            "E5 - - - - . . ."
+          ]
+        },
+        "B": {
+          "chords": ["Am", "G", "F", "E", "Am", "G", "F", "E"],
+          "lead": [
+            "A5 . C6 . B5 A5 G#5 A5",
+            "B5 - G5 - - . D5 G5",
+            "A5 . F5 . C6 . A5 F5",
+            "G#5 - - . E5 F5 G#5 B5",
+            "C6 . B5 . A5 . E5 A5",
+            "B5 . A5 . G5 . D5 G5",
+            "A5 . G#5 . F5 . E5 F5",
+            "E5 - - - B4 - E5 ."
+          ]
+        }
+      },
+      "order": ["I", "A", "B", "A", "B"],
+      "loopFrom": 1
+    },
+    "skyMountain": {
+      "bpm": 140,
+      "swing": 0,
+      "drums": "pop",
+      "bassStyle": "octave",
+      "arpStyle": "bells",
+      "pad": true,
+      "instruments": {
+        "lead": { "wave": "triangle", "vol": 0.14, "vibrato": 1, "delay": 0.25 },
+        "bass": { "wave": "sawtooth", "vol": 0.13, "cutoff": 800 },
+        "pad": { "wave": "sawtooth", "vol": 0.035, "cutoff": 1800, "attack": 0.5 },
+        "arp": { "wave": "fm-bell", "vol": 0.05 }
+      },
+      "sections": {
+        "I": { "chords": ["D", "A", "G", "A"], "lead": null, "drums": "halftime" },
+        "A": {
+          "chords": ["D", "A", "Bm", "G", "D", "A", "G", "A"],
+          "lead": [
+            "F#5 . A5 . D6 - C#6 B5",
+            "A5 - E5 - - . C#5 E5",
+            "F#5 . B5 . D6 - C#6 B5",
+            "B5 - G5 - - . . .",
+            "F#5 . A5 . D6 . E6 F#6",
+            "E6 - C#6 - A5 . C#6 E6",
+            "D6 . B5 . G5 . B5 D6",
+            "C#6 - - - A5 - - ."
+          ]
+        },
+        "B": {
+          "chords": ["G", "A", "F#m", "Bm", "G", "A", "D", "D"],
+          "lead": [
+            "B5 . D6 . G6 - F#6 E6",
+            "C#6 - A5 - - . E5 A5",
+            "C#6 . F#6 . A6 - G#6 F#6",
+            "D6 - B5 - - . F#5 B5",
+            "D6 . B5 . G5 . D6 G6",
+            "E6 . C#6 . A5 . E6 A6",
+            "F#6 - - . E6 . D6 A5",
+            "D6 - - - - . . ."
+          ]
+        }
+      },
+      "order": ["I", "A", "B", "A", "B"],
+      "loopFrom": 1
+    },
+    "oceanResort": {
+      "bpm": 118,
+      "swing": 0.1,
+      "drums": "latin",
+      "bassStyle": "reggae",
+      "arpStyle": "broken",
+      "pad": false,
+      "instruments": {
+        "lead": { "wave": "fm-bell", "vol": 0.14 },
+        "bass": { "wave": "triangle", "vol": 0.24, "cutoff": 1100 },
+        "arp": { "wave": "triangle", "vol": 0.04 }
+      },
+      "sections": {
+        "I": { "chords": ["F", "Bb", "C", "C"], "lead": null },
+        "A": {
+          "chords": ["F", "Bb", "C", "F", "F", "Bb", "C", "F"],
+          "lead": [
+            "C5 . F5 . A5 . G5 F5",
+            "D5 . F5 . Bb5 - A5 G5",
+            "E5 . G5 . C6 . Bb5 G5",
+            "A5 - F5 - - . C5 D5",
+            "F5 . A5 . C6 . A5 F5",
+            "Bb5 . D6 . F6 - D6 Bb5",
+            "C6 . Bb5 . G5 . E5 C5",
+            "F5 - - - - . . ."
+          ]
+        },
+        "B": {
+          "chords": ["Dm", "Gm", "C", "F", "Dm", "Gm", "C", "C"],
+          "lead": [
+            "A5 . D6 . F6 . D6 A5",
+            "Bb5 - G5 - D5 . G5 Bb5",
+            "C6 . G5 . E5 . G5 C6",
+            "A5 - - . C6 . A5 F5",
+            "D6 . A5 . F5 . A5 D6",
+            "D6 . Bb5 . G5 . Bb5 D6",
+            "E6 . C6 . G5 . Bb5 C6",
+            "C6 - - - - . . ."
+          ]
+        }
+      },
+      "order": ["I", "A", "B", "A", "B"],
+      "loopFrom": 1
+    },
+    "lavaCastle": {
+      "bpm": 148,
+      "swing": 0,
+      "drums": "rock",
+      "bassStyle": "pump",
+      "arpStyle": null,
+      "pad": true,
+      "instruments": {
+        "lead": { "wave": "sawtooth", "vol": 0.08, "vibrato": 1.2, "detune": 8, "filter": 2400, "delay": 0.12 },
+        "bass": { "wave": "sawtooth", "vol": 0.16, "cutoff": 600 },
+        "pad": { "wave": "organ", "vol": 0.06, "cutoff": 2400, "attack": 0.05 }
+      },
+      "sections": {
+        "I": { "chords": ["Dm", "Dm", "Bb", "A"], "lead": null, "drums": "march" },
+        "A": {
+          "chords": ["Dm", "Bb", "C", "A", "Dm", "Bb", "Gm", "A"],
+          "lead": [
+            "D5 . D5 . F5 . A5 G5",
+            "F5 - D5 - - . Bb4 D5",
+            "E5 . E5 . G5 . C6 Bb5",
+            "A5 - C#5 - - . E5 .",
+            "D5 . F5 . A5 . D6 C6",
+            "Bb5 - F5 - D5 . F5 Bb5",
+            "G5 . Bb5 . D6 . Bb5 G5",
+            "A5 - - - C#6 - E6 ."
+          ]
+        },
+        "B": {
+          "chords": ["Gm", "Dm", "A", "Dm", "Gm", "Dm", "E", "A"],
+          "lead": [
+            "D6 - Bb5 - G5 . A5 Bb5",
+            "A5 - F5 - D5 . E5 F5",
+            "E5 - C#5 - A4 . C#5 E5",
+            "D5 - - - - . . .",
+            "G5 . Bb5 . D6 . G6 F6",
+            "F6 . D6 . A5 . D6 F6",
+            "G#5 . B5 . D6 . E6 D6",
+            "C#6 - - - A5 - - ."
+          ]
+        }
+      },
+      "order": ["I", "A", "B", "A", "B"],
+      "loopFrom": 1
+    },
+    "cyberCircuit": {
+      "bpm": 142,
+      "swing": 0,
+      "drums": "techno",
+      "bassStyle": "sixteenth",
+      "arpStyle": "up16",
+      "pad": true,
+      "instruments": {
+        "lead": { "wave": "sawtooth", "vol": 0.07, "detune": 14, "filter": 3000, "delay": 0.32 },
+        "bass": { "wave": "sawtooth", "vol": 0.14, "cutoff": 650 },
+        "pad": { "wave": "sawtooth", "vol": 0.035, "cutoff": 1500, "attack": 0.6 },
+        "arp": { "wave": "pulse12", "vol": 0.022 }
+      },
+      "sections": {
+        "I": { "chords": ["Em", "C", "G", "B"], "lead": null },
+        "A": {
+          "chords": ["Em", "C", "G", "D", "Em", "C", "G", "B"],
+          "lead": [
+            "E5 . B4 . E5 . G5 F#5",
+            "E5 - C5 - - . G4 C5",
+            "D5 . B4 . D5 . G5 A5",
+            "F#5 - - - D5 . . .",
+            "B5 . G5 . E5 . B5 C6",
+            "B5 - G5 - E5 . G5 B5",
+            "D6 . B5 . G5 . D6 E6",
+            "D#6 - - - B5 - - ."
+          ]
+        },
+        "B": {
+          "chords": ["C", "D", "Em", "Em", "C", "D", "B", "B"],
+          "lead": [
+            "G5 . G5 . E5 . C6 B5",
+            "A5 . A5 . F#5 . D6 C6",
+            "B5 . B5 . G5 . E6 D6",
+            "B5 - - - - . . .",
+            "C6 . E6 . G6 . E6 C6",
+            "D6 . F#6 . A6 . F#6 D6",
+            "D#6 . F#6 . B6 . A6 F#6",
+            "D#6 - - - - . . ."
+          ]
+        }
+      },
+      "order": ["I", "A", "B", "A", "B"],
+      "loopFrom": 1
+    },
+    "forestTemple": {
+      "bpm": 122,
+      "swing": 0.08,
+      "drums": "tribal",
+      "bassStyle": "sustain",
+      "arpStyle": "broken",
+      "pad": true,
+      "instruments": {
+        "lead": { "wave": "marimba", "vol": 0.14 },
+        "bass": { "wave": "triangle", "vol": 0.22, "cutoff": 900 },
+        "pad": { "wave": "triangle", "vol": 0.05, "cutoff": 1200, "attack": 0.6 },
+        "arp": { "wave": "fm-bell", "vol": 0.035 }
+      },
+      "sections": {
+        "I": { "chords": ["Am", "G", "F", "E"], "lead": null, "drums": "halftime" },
+        "A": {
+          "chords": ["Am", "G", "F", "G", "Am", "G", "F", "E"],
+          "lead": [
+            "A5 . C6 . E6 . D6 C6",
+            "D6 - B5 - G5 . A5 B5",
+            "C6 . A5 . F5 . A5 C6",
+            "B5 - - . G5 . D5 .",
+            "E5 . A5 . C6 . E6 G6",
+            "D6 . B5 . G5 . B5 D6",
+            "C6 . A5 . F5 . A5 C6",
+            "B5 - - - G#5 - E5 ."
+          ]
+        },
+        "B": {
+          "chords": ["Dm", "Am", "G", "C", "Dm", "Am", "E", "E"],
+          "lead": [
+            "F5 . A5 . D6 . C6 A5",
+            "C6 - A5 - E5 . A5 C6",
+            "B5 . D6 . G6 . D6 B5",
+            "C6 - - - G5 - E5 .",
+            "D6 . F6 . A6 . F6 D6",
+            "E6 . C6 . A5 . C6 E6",
+            "B5 . G#5 . E5 . G#5 B5",
+            "E6 - - - - . . ."
+          ]
+        }
+      },
+      "order": ["I", "A", "B", "A", "B"],
+      "loopFrom": 1
+    },
+    "results": {
+      "bpm": 108,
+      "swing": 0.12,
+      "drums": "shuffle",
+      "bassStyle": "walk",
+      "arpStyle": null,
+      "pad": true,
+      "instruments": {
+        "lead": { "wave": "pulse25", "vol": 0.09, "vibrato": 1, "delay": 0.15 },
+        "bass": { "wave": "triangle", "vol": 0.2, "cutoff": 1100 },
+        "pad": { "wave": "triangle", "vol": 0.05, "cutoff": 1500 }
+      },
+      "sections": {
+        "A": {
+          "chords": ["C", "F", "G", "C", "Am", "Dm", "G", "C"],
+          "lead": [
+            "G5 . C6 . E6 - D6 C6",
+            "A5 - C6 - F6 - E6 D6",
+            "B5 . D6 . G6 - F6 D6",
+            "E6 - - - C6 - - .",
+            "A5 . C6 . E6 - D6 C6",
+            "D6 - F6 - A6 - G6 F6",
+            "E6 . D6 . B5 . G5 B5",
+            "C6 - - - - . . ."
+          ]
+        },
+        "B": {
+          "chords": ["F", "G", "Em", "Am", "Dm", "G", "C", "C"],
+          "lead": null
+        }
+      },
+      "order": ["A", "B"],
+      "loopFrom": 0
+    },
+    "star": {
+      "bpm": 172,
+      "swing": 0,
+      "drums": "disco",
+      "bassStyle": "octave",
+      "arpStyle": "up16",
+      "pad": false,
+      "instruments": {
+        "lead": { "wave": "square", "vol": 0.09 },
+        "bass": { "wave": "square", "vol": 0.1, "cutoff": 1400 },
+        "arp": { "wave": "square", "vol": 0.02 }
+      },
+      "sections": {
+        "A": {
+          "chords": ["C", "C", "Bb", "Bb", "Ab", "Bb", "C", "C"],
+          "lead": [
+            "C6 . C6 . C6 . G5 C6",
+            ". C6 . G5 C6 . E6 .",
+            "D6 . D6 . D6 . F5 D6",
+            ". D6 . F5 D6 . F6 .",
+            "C6 . C6 . Eb6 . C6 Ab5",
+            "D6 . D6 . F6 . D6 Bb5",
+            "C6 . E6 . G6 . E6 C6",
+            "G6 . . G6 . . C7 ."
+          ]
+        }
+      },
+      "order": ["A"],
+      "loopFrom": 0
+    }
+  },
+  "jingles": {
+    "finalLap": { "bpm": 170, "wave": "square", "notes": "C5:2 C5:1 C5:1 E5:2 G5:2 C6:2 .:1 G5:1 C6:6" },
+    "finishGood": { "bpm": 150, "wave": "square", "notes": "G5:2 C6:2 E6:2 G6:4 E6:2 G6:8 C6+E6+G6:10" },
+    "finishBad": { "bpm": 130, "wave": "triangle", "notes": "E5:2 D5:2 C5:2 G4:4 A4:2 G4:8 C4+E4:8" },
+    "victory": { "bpm": 140, "wave": "square", "notes": "C5:2 E5:2 G5:2 C6:4 G5:2 C6:4 E6:4 D6:2 C6:2 D6:2 E6:4 C6+E6+G6:12" },
+    "defeat": { "bpm": 110, "wave": "triangle", "notes": "C5:4 B4:4 Bb4:4 A4:8 Ab4+C5:12" }
+  }
+}

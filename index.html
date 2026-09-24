@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="KARTOPIA · Turbo Grand Prix — juego de carreras de karts 3D en el navegador con HTML5, WebGL y Web Audio." />
+    <meta name="theme-color" content="#1a1147" />
+    <title>KARTOPIA · Turbo Grand Prix</title>
+    <link rel="icon" type="image/svg+xml" href="assets/ui/favicon.svg" />
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/menu.css" />
+    <link rel="stylesheet" href="css/game.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three/build/three.module.min.js",
+          "three/addons/": "./vendor/three/addons/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game-canvas" aria-label="Vista del juego"></canvas>
+      <canvas id="fx-canvas" aria-hidden="true"></canvas>
+      <div id="flash" aria-hidden="true"></div>
+      <div id="hud" class="hud hidden" aria-live="polite"></div>
+      <div id="ui-root"></div>
+      <div id="toast-root" aria-live="polite"></div>
+      <div id="fps" class="hidden"></div>
+      <div id="fade" class="fade"></div>
+      <div id="boot" class="boot">
+        <div class="boot-logo">KARTOPIA</div>
+        <div class="boot-bar"><div class="boot-bar-fill" id="boot-fill"></div></div>
+        <div class="boot-text" id="boot-text">Cargando…</div>
+      </div>
+    </div>
+    <noscript>
+      <div class="noscript">Este juego necesita JavaScript y WebGL. Ábrelo con un navegador moderno a través de un servidor local.</div>
+    </noscript>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
