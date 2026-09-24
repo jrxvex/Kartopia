@@ -7,6 +7,11 @@
 **Un juego de carreras de karts en 3D que se juega en el navegador.**<br>
 Derrapes, mini-turbos, objetos, 8 circuitos, IA rival y Gran Premio. Sin instalar nada.
 
+<a href="https://mariocart.jorgesanchezvillanuevaa.workers.dev"><img src="https://img.shields.io/badge/%E2%96%B6%EF%B8%8F%20JUGAR%20AHORA-mariocart.jorgesanchezvillanuevaa.workers.dev-ff5722?style=for-the-badge" alt="Jugar ahora" height="42"></a>
+
+**👉 [mariocart.jorgesanchezvillanuevaa.workers.dev](https://mariocart.jorgesanchezvillanuevaa.workers.dev) 👈**<br>
+<sub>Ábrelo en el navegador del ordenador y a correr. Se juega con teclado o mando.</sub>
+
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
@@ -14,7 +19,7 @@ Derrapes, mini-turbos, objetos, 8 circuitos, IA rival y Gran Premio. Sin instala
 ![WebGL 2](https://img.shields.io/badge/WebGL_2-990000?style=for-the-badge&logo=webgl&logoColor=white)
 ![Web Audio](https://img.shields.io/badge/Web_Audio-8E24AA?style=for-the-badge)
 
-[🚀 Jugar](#-cómo-jugar) ·
+[🚀 Jugar online](https://mariocart.jorgesanchezvillanuevaa.workers.dev) ·
 [🎮 Controles](#-controles) ·
 [🗺️ Circuitos](#️-circuitos) ·
 [🎁 Objetos](#-objetos) ·
@@ -74,6 +79,15 @@ Derrapes, mini-turbos, objetos, 8 circuitos, IA rival y Gran Premio. Sin instala
 ---
 
 ## 🚀 Cómo jugar
+
+### 🌐 Online
+
+**Juega directamente aquí: <https://mariocart.jorgesanchezvillanuevaa.workers.dev>**
+
+Solo necesitas un navegador actual en el ordenador (Chrome, Edge, Firefox o Safari 16 o
+posterior) con **WebGL 2**. Se juega con teclado o con mando.
+
+### 💻 En tu ordenador
 
 No hay que compilar ni instalar dependencias. Solo hace falta **servir la carpeta con un servidor
 local**. Si abres `index.html` con doble clic no funciona, porque el navegador bloquea los módulos.
