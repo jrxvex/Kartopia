@@ -7,9 +7,9 @@
 **Un juego de carreras de karts en 3D que se juega en el navegador.**<br>
 Derrapes, mini-turbos, objetos, 8 circuitos, IA rival y Gran Premio. Sin instalar nada.
 
-<a href="https://mariocart.jorgesanchezvillanuevaa.workers.dev"><img src="https://img.shields.io/badge/%E2%96%B6%EF%B8%8F%20JUGAR%20AHORA-mariocart.jorgesanchezvillanuevaa.workers.dev-ff5722?style=for-the-badge" alt="Jugar ahora" height="42"></a>
+<a href="https://kartopia.jorgesanchezvillanuevaa.workers.dev"><img src="https://img.shields.io/badge/%E2%96%B6%EF%B8%8F%20JUGAR%20AHORA-kartopia.jorgesanchezvillanuevaa.workers.dev-ff5722?style=for-the-badge" alt="Jugar ahora" height="42"></a>
 
-**👉 [mariocart.jorgesanchezvillanuevaa.workers.dev](https://mariocart.jorgesanchezvillanuevaa.workers.dev) 👈**<br>
+**👉 [kartopia.jorgesanchezvillanuevaa.workers.dev](https://kartopia.jorgesanchezvillanuevaa.workers.dev) 👈**<br>
 <sub>Ábrelo en el navegador del ordenador y a correr. Se juega con teclado o mando.</sub>
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
@@ -19,7 +19,7 @@ Derrapes, mini-turbos, objetos, 8 circuitos, IA rival y Gran Premio. Sin instala
 ![WebGL 2](https://img.shields.io/badge/WebGL_2-990000?style=for-the-badge&logo=webgl&logoColor=white)
 ![Web Audio](https://img.shields.io/badge/Web_Audio-8E24AA?style=for-the-badge)
 
-[🚀 Jugar online](https://mariocart.jorgesanchezvillanuevaa.workers.dev) ·
+[🚀 Jugar online](https://kartopia.jorgesanchezvillanuevaa.workers.dev) ·
 [🎮 Controles](#-controles) ·
 [🗺️ Circuitos](#️-circuitos) ·
 [🎁 Objetos](#-objetos) ·
@@ -82,7 +82,7 @@ Derrapes, mini-turbos, objetos, 8 circuitos, IA rival y Gran Premio. Sin instala
 
 ### 🌐 Online
 
-**Juega directamente aquí: <https://mariocart.jorgesanchezvillanuevaa.workers.dev>**
+**Juega directamente aquí: <https://kartopia.jorgesanchezvillanuevaa.workers.dev>**
 
 Solo necesitas un navegador actual en el ordenador (Chrome, Edge, Firefox o Safari 16 o
 posterior) con **WebGL 2**. Se juega con teclado o con mando.
