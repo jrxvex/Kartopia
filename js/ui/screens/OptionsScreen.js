@@ -92,6 +92,21 @@ export class OptionsScreen extends Screen {
       rows.push(toggleRow('Minimapa', s.showMinimap, (v) => set({ showMinimap: v })));
       rows.push(toggleRow('Clasificación en pantalla', s.showRanking, (v) => set({ showRanking: v })));
       rows.push(toggleRow('Fantasma en contrarreloj', s.ghost, (v) => set({ ghost: v })));
+      rows.push(
+        choiceRow(
+          'Controles táctiles',
+          [
+            { value: 'auto', label: 'Automático', sub: 'al tocar la pantalla' },
+            { value: 'on', label: 'Siempre' },
+            { value: 'off', label: 'Nunca' },
+          ],
+          s.touchControls || 'auto',
+          (v) => set({ touchControls: v }),
+        ),
+      );
+      rows.push(toggleRow('Acelerar automáticamente (táctil)', s.autoAccelerate, (v) => set({ autoAccelerate: v })));
+      rows.push(sliderRow('Tamaño de los botones táctiles', s.touchScale || 1, 0.75, 1.4, 0.05, (v) => set({ touchScale: v })));
+      if (document.documentElement.requestFullscreen) rows.push(button('Pantalla completa', () => g.toggleFullscreen(), { cls: 'btn-wide' }));
     } else {
       const volatile = g.save.volatile;
       rows.push(h('p.small.hint-text', volatile ? 'Tu navegador no permite guardar datos (modo privado): el progreso se perderá al cerrar.' : 'Tus ajustes, controles, récords, fantasmas y estadísticas se guardan en este navegador (localStorage).'));

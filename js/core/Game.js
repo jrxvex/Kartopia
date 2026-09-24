@@ -12,6 +12,7 @@ import { generatePortraits } from '../render/Portraits.js';
 import { AudioManager } from '../audio/AudioManager.js';
 import { UIManager } from '../ui/UIManager.js';
 import { HUD } from '../ui/HUD.js';
+import { TouchControls, isTouchPrimary, isTouchDevice } from '../input/TouchControls.js';
 import { Showcase } from '../ui/Showcase.js';
 import { RaceManager } from '../race/RaceManager.js';
 import { loadTrackDef } from '../tracks/index.js';
@@ -38,6 +39,8 @@ export class Game {
 
   async init(progress = () => {}) {
     this.save = new SaveManager();
+    // Primera vez en un móvil o tableta: gráficos más ligeros por defecto
+    if (this.save.firstRun && isTouchPrimary()) this.save.updateSettings({ quality: 'medium', shadows: false, bloom: false });
     this.settings = this.save.settings;
     this.input = new InputManager(this.save.controls);
     progress(0.25, 'Iniciando gráficos…');
@@ -48,6 +51,7 @@ export class Game {
     this.audio = new AudioManager(this.settings, this.data.music);
     const unlock = () => this.audio.unlock();
     window.addEventListener('pointerdown', unlock);
+    window.addEventListener('touchend', unlock);
     window.addEventListener('keydown', unlock);
     this.input.onAnyKey(unlock);
     progress(0.45, 'Creando pilotos…');
@@ -57,6 +61,7 @@ export class Game {
     this.showcase = new Showcase(this);
     this.ui = new UIManager(this, this.uiRoot);
     this.hud = new HUD(this, this.hudRoot);
+    this.touch = new TouchControls(this, document.getElementById('touch-root'));
     this.loop = new GameLoop({
       fixedUpdate: (dt) => this.fixedUpdate(dt),
       update: (dt, alpha, raw) => this.update(dt, alpha, raw),
@@ -69,6 +74,10 @@ export class Game {
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && this.state === 'race' && !this.paused && this.race && this.race.phase !== 'finished') this.pause();
     });
+    // En móvil, girar la pantalla a vertical pausa la carrera
+    window.addEventListener('resize', () => {
+      if (isTouchDevice() && window.innerHeight > window.innerWidth && this.state === 'race' && !this.paused && this.race && this.race.phase !== 'finished') this.pause();
+    });
   }
 
   // ------------------------------------------------------------------------------ Ajustes
@@ -79,6 +88,7 @@ export class Game {
     this.input.setControls(this.save.controls);
     this.fpsEl.classList.toggle('hidden', !s.showFps);
     document.documentElement.style.setProperty('--hud-scale', String(s.hudScale || 1));
+    document.documentElement.style.setProperty('--touch-scale', String(s.touchScale || 1));
     if (this.view) {
       this.view.settings = s;
       this.view.sun.castShadow = !!s.shadows;
@@ -385,6 +395,20 @@ export class Game {
     }
   }
 
+  /** Pantalla completa y orientación horizontal (móviles). Requiere un gesto del usuario. */
+  requestFullscreen() {
+    const el = document.documentElement;
+    if (document.fullscreenElement || !el.requestFullscreen) return;
+    el.requestFullscreen({ navigationUI: 'hide' })
+      .then(() => screen.orientation?.lock?.('landscape'))
+      .catch(() => {});
+  }
+
+  toggleFullscreen() {
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    else this.requestFullscreen();
+  }
+
   /** Solo para depuración/pruebas automáticas: acelera la simulación. */
   setTimeScale(s) {
     this.loop.timeScale = Math.max(0.1, Math.min(20, s || 1));
@@ -403,6 +427,7 @@ export class Game {
 
   update(dt, alpha, raw) {
     this.input.poll(raw);
+    this.touch.update();
     if (this.state === 'race' && this.view) {
       const a = this.paused ? 1 : alpha;
       if (!this.paused) this.view.update(dt, a);

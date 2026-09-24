@@ -4,6 +4,17 @@ import { h, button } from '../dom.js';
 import { ACTIONS, ACTION_LABELS } from '../../config.js';
 import { keyLabel } from '../../input/KeyNames.js';
 
+const TOUCH = [
+  ['Girar', 'Joystick (mitad izquierda)'],
+  ['Derrape / salto', 'Botón ⤴'],
+  ['Usar objeto', 'Botón del objeto'],
+  ['Frenar / marcha atrás', 'Botón ▼'],
+  ['Acelerar', 'Automático (o botón ▲)'],
+  ['Lanzar hacia atrás', 'Joystick abajo + objeto'],
+  ['Salida turbo', 'Mantén TURBO en el «2»'],
+  ['Pausa', 'Botón ❚❚'],
+];
+
 const PAD = [
   ['Acelerar', 'A / RT'],
   ['Frenar / marcha atrás', 'B / LT'],
@@ -29,6 +40,12 @@ export class ControlsScreen extends Screen {
           h('p.small', 'Compatible con mandos estándar (Xbox, PlayStation, genéricos).'),
           ...PAD.map(([a, b]) => h('div.pad-row', h('span', a), h('kbd', b))),
           button('Restablecer teclado', () => this.reset(), { cls: 'btn-wide' }),
+        ),
+        h(
+          'div.info-card.pad-card.touch-card',
+          h('h2', '📱 Pantalla táctil'),
+          h('p.small', 'Se activan solos al tocar la pantalla. Ajustes en Opciones → Juego.'),
+          ...TOUCH.map(([a, b]) => h('div.pad-row', h('span', a), h('kbd', b))),
         ),
       ),
       this.footer([['↑↓←→', 'Elegir'], ['Intro', 'Cambiar tecla'], ['Esc', 'Volver']]),

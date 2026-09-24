@@ -150,6 +150,9 @@ export const DEFAULT_SETTINGS = {
   showMinimap: true,
   showRanking: true,
   ghost: true,
+  touchControls: 'auto', // 'auto' | 'on' | 'off'
+  autoAccelerate: true, // solo con controles táctiles
+  touchScale: 1.0,
   lastCharacter: 'blaze',
   lastKart: 'standard',
   lastTrack: 'green-valley',

@@ -19,7 +19,7 @@ export class TrackSelectScreen extends Screen {
           type: 'button',
           'data-default': t.id === ss.trackId ? '1' : null,
           style: { '--accent': t.color, '--accent2': t.accent },
-          onClick: () => this.pick(t.id),
+          onClick: (e) => this.touchPick(e, () => this.pick(t.id)),
           onNavfocus: () => this.preview(t.id),
         },
         canvas,
@@ -31,7 +31,7 @@ export class TrackSelectScreen extends Screen {
     this.el.append(
       this.header(ss.mode === 'timetrial' ? 'Contrarreloj · Circuito' : 'Elige circuito', null, this.wizardSteps('track')),
       h('div.track-layout', h('div.track-grid', ...cards), this.info),
-      this.footer([['←→↑↓', 'Elegir'], ['Intro', 'Aceptar'], ['Esc', 'Volver']]),
+      this.footer([['←→↑↓', 'Elegir'], ['Intro', 'Aceptar'], ['Esc', 'Volver']], this.pickButton(() => this.pick(this.selectedId))),
     );
     this.preview(ss.trackId);
   }
@@ -41,6 +41,7 @@ export class TrackSelectScreen extends Screen {
   }
 
   preview(id) {
+    this.selectedId = id;
     const g = this.game;
     const t = g.data.track(id);
     const best = g.save.getBestTime(t.id);

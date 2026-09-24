@@ -2,7 +2,10 @@
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="description" content="KARTOPIA · Turbo Grand Prix — juego de carreras de karts 3D en el navegador con HTML5, WebGL y Web Audio." />
     <meta name="theme-color" content="#1a1147" />
     <title>KARTOPIA · Turbo Grand Prix</title>
@@ -10,6 +13,7 @@
     <link rel="stylesheet" href="css/main.css" />
     <link rel="stylesheet" href="css/menu.css" />
     <link rel="stylesheet" href="css/game.css" />
+    <link rel="stylesheet" href="css/touch.css" />
     <script type="importmap">
       {
         "imports": {
@@ -25,10 +29,15 @@
       <canvas id="fx-canvas" aria-hidden="true"></canvas>
       <div id="flash" aria-hidden="true"></div>
       <div id="hud" class="hud hidden" aria-live="polite"></div>
+      <div id="touch-root" class="touch-controls hidden" aria-hidden="true"></div>
       <div id="ui-root"></div>
       <div id="toast-root" aria-live="polite"></div>
       <div id="fps" class="hidden"></div>
       <div id="fade" class="fade"></div>
+      <div id="rotate" class="rotate">
+        <div class="rotate-phone"></div>
+        <p>Gira el móvil para jugar en horizontal</p>
+      </div>
       <div id="boot" class="boot">
         <div class="boot-logo">KARTOPIA</div>
         <div class="boot-bar"><div class="boot-bar-fill" id="boot-fill"></div></div>

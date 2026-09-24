@@ -47,7 +47,9 @@ export class UIManager {
     this.currentName = null;
     this.history = [];
     this.toastRoot = document.getElementById('toast-root');
-    root.addEventListener('mousemove', (e) => {
+    root.addEventListener('pointermove', (e) => {
+      // Solo el ratón enfoca al pasar por encima (en táctil el primer toque ya enfoca)
+      if (e.pointerType !== 'mouse') return;
       const f = e.target.closest && e.target.closest('.focusable');
       if (f && f !== this.nav.current && this.current && this.current.el.contains(f)) this.nav.focus(f, false);
     });

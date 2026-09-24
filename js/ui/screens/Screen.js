@@ -1,5 +1,5 @@
 // Clase base de las pantallas de menú.
-import { h } from '../dom.js';
+import { h, button } from '../dom.js';
 
 export class Screen {
   constructor(ui, name) {
@@ -32,8 +32,32 @@ export class Screen {
     );
   }
 
-  footer(hints = [['Intro', 'Aceptar'], ['Esc', 'Volver']]) {
-    return h('footer.screen-footer', ...hints.map(([k, l]) => h('span.hint', h('kbd', k), ' ', l)));
+  footer(hints = [['Intro', 'Aceptar'], ['Esc', 'Volver']], ...extra) {
+    // La pista de «Esc» es además un botón (ratón y pantallas táctiles)
+    return h(
+      'footer.screen-footer',
+      ...extra,
+      ...hints.map(([k, l]) =>
+        k === 'Esc'
+          ? h('button.hint.hint-back', { type: 'button', onClick: () => this.ui.handleMenu('back') }, h('kbd', k), h('span.hint-back-arrow', '‹'), ' ', l)
+          : h('span.hint', h('kbd', k), ' ', l),
+      ),
+    );
+  }
+
+  /** En pantallas táctiles, el primer toque muestra la vista previa y el segundo confirma. */
+  touchPick(e, fn) {
+    const el = e && e.currentTarget;
+    if (this.game.touch?.wanted && el && this.ui.nav.current !== el) {
+      this.ui.nav.focus(el);
+      return;
+    }
+    fn();
+  }
+
+  /** Botón para confirmar la selección con el dedo (solo visible con controles táctiles). */
+  pickButton(fn, label = 'Elegir') {
+    return button(`${label} ›`, fn, { cls: 'btn-pick btn-go' });
   }
 
   /** Pasos del asistente de selección según el modo. */

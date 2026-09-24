@@ -10,7 +10,7 @@ Derrapes, mini-turbos, objetos, 8 circuitos, IA rival y Gran Premio. Sin instala
 <a href="https://kartopia.jorgesanchezvillanuevaa.workers.dev"><img src="https://img.shields.io/badge/%E2%96%B6%EF%B8%8F%20JUGAR%20AHORA-kartopia.jorgesanchezvillanuevaa.workers.dev-ff5722?style=for-the-badge" alt="Jugar ahora" height="42"></a>
 
 **👉 [kartopia.jorgesanchezvillanuevaa.workers.dev](https://kartopia.jorgesanchezvillanuevaa.workers.dev) 👈**<br>
-<sub>Ábrelo en el navegador del ordenador y a correr. Se juega con teclado o mando.</sub>
+<sub>Funciona en el ordenador (teclado o mando) y en el móvil o la tableta con controles táctiles.</sub>
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
@@ -52,6 +52,7 @@ Derrapes, mini-turbos, objetos, 8 circuitos, IA rival y Gran Premio. Sin instala
 - **Trucos** en las rampas que se convierten en turbo al aterrizar
 - **Control aéreo**, pendientes, peraltes, hielo, barro y arena
 - **Rescate** automático si te caes al vacío, al agua o a la lava
+- **📱 Móvil y tableta** con joystick táctil, botones y aceleración automática
 
 </td>
 </tr>
@@ -84,8 +85,9 @@ Derrapes, mini-turbos, objetos, 8 circuitos, IA rival y Gran Premio. Sin instala
 
 **Juega directamente aquí: <https://kartopia.jorgesanchezvillanuevaa.workers.dev>**
 
-Solo necesitas un navegador actual en el ordenador (Chrome, Edge, Firefox o Safari 16 o
-posterior) con **WebGL 2**. Se juega con teclado o con mando.
+Funciona en cualquier navegador actual con **WebGL 2** (Chrome, Edge, Firefox o Safari 16 o
+posterior). En el ordenador se juega con teclado o mando, y en el **móvil o la tableta** con
+controles táctiles: pon el móvil en horizontal y el juego se abre a pantalla completa.
 
 ### 💻 En tu ordenador
 
@@ -104,25 +106,30 @@ npx serve -l 8080 .               # con Node.js
 Después abre **<http://localhost:8080>** en Chrome, Edge, Firefox o Safari 16 o posterior. Hace
 falta que el navegador tenga **WebGL 2**.
 
-> 💡 Si va lento en tu ordenador, entra en **Opciones → Gráficos** y baja la calidad.
+> 💡 Si va lento, entra en **Opciones → Gráficos** y baja la calidad. En móviles el juego ya
+> empieza con una calidad más ligera.
 
 ---
 
 ## 🎮 Controles
 
-| Acción | ⌨️ Teclado | 🎮 Mando |
-| :-- | :--: | :--: |
-| Acelerar | `W` / `↑` | A · gatillo derecho |
-| Frenar / marcha atrás | `S` / `↓` | B · gatillo izquierdo |
-| Girar | `A` `D` / `←` `→` | Stick izquierdo · cruceta |
-| Derrape / salto | `Espacio` | RB · X |
-| Usar objeto | `Shift` | LB · Y |
-| Mirar atrás | `C` | — |
-| Rescate manual | `R` | Select |
-| Pausa | `Esc` / `P` | Start |
+| Acción | ⌨️ Teclado | 🎮 Mando | 📱 Táctil |
+| :-- | :--: | :--: | :--: |
+| Acelerar | `W` / `↑` | A · gatillo derecho | Automático |
+| Frenar / marcha atrás | `S` / `↓` | B · gatillo izquierdo | Botón ▼ |
+| Girar | `A` `D` / `←` `→` | Stick izquierdo · cruceta | Joystick (mitad izquierda) |
+| Derrape / salto | `Espacio` | RB · X | Botón ⤴ |
+| Usar objeto | `Shift` | LB · Y | Botón del objeto |
+| Mirar atrás | `C` | — | — |
+| Rescate manual | `R` | Select | — |
+| Pausa | `Esc` / `P` | Start | Botón ❚❚ |
 
-Todos los botones se pueden cambiar en **Opciones → Controles**. Los menús funcionan con teclado,
-ratón o mando.
+Las teclas se pueden cambiar en **Opciones → Controles**. Los menús funcionan con teclado, ratón,
+mando o tocando la pantalla.
+
+> 📱 **En el móvil:** los controles táctiles aparecen solos. En **Opciones → Juego** puedes quitar
+> la aceleración automática (aparece un botón de gas), cambiar el tamaño de los botones o
+> forzar los controles táctiles. Para la salida turbo, mantén el botón **TURBO** en el «2».
 
 <details>
 <summary><b>🏆 Trucos para ganar</b></summary>

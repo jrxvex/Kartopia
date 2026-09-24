@@ -1,5 +1,6 @@
-// Gestor de entrada: teclado (remapeable) + mando (Gamepad API), con detección de pulsaciones
-// segura para el bucle de paso fijo y navegación de menús.
+// Gestor de entrada: teclado (remapeable), mando (Gamepad API) y botones virtuales de los
+// controles táctiles, con detección de pulsaciones segura para el bucle de paso fijo y
+// navegación de menús.
 import { ACTIONS, GAMEPAD_BINDINGS } from '../config.js';
 
 const MENU_KEYS = {
@@ -48,6 +49,9 @@ export class InputManager {
     this.padActionDown = {};
     this.menuRepeat = { dir: null, timer: 0 };
     this.lastDevice = 'keyboard';
+    // Controles táctiles: botones virtuales y joystick (x: giro, y: apuntar objetos)
+    this.virtualDown = {};
+    this.virtualStick = [0, 0];
 
     this._onKeyDown = this._onKeyDown.bind(this);
     this._onKeyUp = this._onKeyUp.bind(this);
@@ -128,6 +132,26 @@ export class InputManager {
   _onBlur() {
     this.keysDown.clear();
     this.pressed.clear();
+    for (const a of Object.keys(this.virtualDown)) this.virtualDown[a] = false;
+    this.virtualStick[0] = 0;
+    this.virtualStick[1] = 0;
+  }
+
+  // ---------------------------------------------------------------- Táctil
+  /** Estado de un botón virtual de los controles táctiles. */
+  setVirtual(action, down, markDevice = true) {
+    const was = !!this.virtualDown[action];
+    if (down === was) return;
+    this.virtualDown[action] = down;
+    if (down) this.pressed.add(action);
+    else this.released.add(action);
+    if (down && markDevice) this.lastDevice = 'touch';
+  }
+
+  /** Joystick táctil: x en [-1, 1] para girar; y > 0 hacia abajo (apuntar atrás). */
+  setVirtualStick(x, y) {
+    this.virtualStick[0] = x;
+    this.virtualStick[1] = y;
   }
 
   _emitMenu(action, repeat = false) {
@@ -210,7 +234,7 @@ export class InputManager {
       if (binds[0] && this.keysDown.has(binds[0])) return true;
       if (binds[1] && this.keysDown.has(binds[1])) return true;
     }
-    return !!this.padActionDown[action];
+    return !!this.padActionDown[action] || !!this.virtualDown[action];
   }
 
   /** Devuelve true una sola vez por pulsación (seguro con paso fijo). */
@@ -245,6 +269,7 @@ export class InputManager {
       if (this.padButtons[14]) s -= 1;
       if (this.padButtons[15]) s += 1;
     }
+    if (s === 0 && this.virtualStick[0] !== 0) s = this.virtualStick[0];
     return s;
   }
 
@@ -257,8 +282,8 @@ export class InputManager {
 
   /** Dirección vertical del stick/teclas para lanzar objetos (-1 atrás, 1 delante). */
   getAim() {
-    if (this.isDown('brake') || this.padAxes[1] > 0.5) return -1;
-    if (this.padAxes[1] < -0.5) return 1;
+    if (this.isDown('brake') || this.padAxes[1] > 0.5 || this.virtualStick[1] > 0.5) return -1;
+    if (this.padAxes[1] < -0.5 || this.virtualStick[1] < -0.5) return 1;
     return 0;
   }
 

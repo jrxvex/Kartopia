@@ -28,7 +28,7 @@ export class KartSelectScreen extends Screen {
           type: 'button',
           'data-default': k.id === ss.kart ? '1' : null,
           style: { '--accent': c.colors.outfit },
-          onClick: () => this.pick(k.id),
+          onClick: (e) => this.touchPick(e, () => this.pick(k.id)),
           onNavfocus: () => this.preview(k.id),
         },
         h('span.kart-icon', BODY_ICONS[k.body] || '🏎️'),
@@ -38,7 +38,7 @@ export class KartSelectScreen extends Screen {
     this.el.append(
       this.header('Elige kart', null, this.wizardSteps('kart')),
       h('div.select-layout', h('div.kart-grid', ...tiles), this.info),
-      this.footer([['←→↑↓', 'Elegir'], ['Intro', 'Aceptar'], ['Esc', 'Volver']]),
+      this.footer([['←→↑↓', 'Elegir'], ['Intro', 'Aceptar'], ['Esc', 'Volver']], this.pickButton(() => this.pick(this.selectedId))),
     );
     this.preview(ss.kart);
   }
@@ -48,6 +48,7 @@ export class KartSelectScreen extends Screen {
   }
 
   preview(id) {
+    this.selectedId = id;
     const g = this.game;
     const c = g.data.character(g.session.character);
     const k = g.data.kart(id);

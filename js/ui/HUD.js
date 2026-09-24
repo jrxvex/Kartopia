@@ -162,7 +162,7 @@ export class HUD {
   showIntro() {
     const r = this.race;
     const meta = this.game.data.track(r.track.id);
-    this.el.intro.replaceChildren(h('div.intro-name', meta.name), h('div.intro-sub', 'Pulsa Intro para saltar la presentación'));
+    this.el.intro.replaceChildren(h('div.intro-name', meta.name), h('div.intro-sub', this.game.touch?.wanted ? 'Toca la pantalla para saltar la presentación' : 'Pulsa Intro para saltar la presentación'));
     this.el.intro.classList.add('show');
   }
 

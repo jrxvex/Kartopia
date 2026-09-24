@@ -73,6 +73,7 @@ export class SaveManager {
     } catch (e) {
       raw = null;
     }
+    this.firstRun = !raw;
     if (!raw) return;
     try {
       const parsed = JSON.parse(raw);

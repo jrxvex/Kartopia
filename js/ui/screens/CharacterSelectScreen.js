@@ -29,7 +29,7 @@ export class CharacterSelectScreen extends Screen {
           'data-default': c.id === ss.character ? '1' : null,
           'data-id': c.id,
           style: { '--accent': c.colors.outfit },
-          onClick: () => this.pick(c.id),
+          onClick: (e) => this.touchPick(e, () => this.pick(c.id)),
           onNavfocus: () => this.preview(c.id),
         },
         h('img.char-portrait', { src: g.portraits[c.id] || '', alt: c.name, draggable: 'false' }),
@@ -39,7 +39,7 @@ export class CharacterSelectScreen extends Screen {
     this.el.append(
       this.header('Elige piloto', null, this.wizardSteps('character')),
       h('div.select-layout', h('div.char-grid', ...tiles), this.info),
-      this.footer([['←→↑↓', 'Elegir'], ['Intro', 'Aceptar'], ['Esc', 'Volver']]),
+      this.footer([['←→↑↓', 'Elegir'], ['Intro', 'Aceptar'], ['Esc', 'Volver']], this.pickButton(() => this.pick(this.selectedId))),
     );
     this.preview(ss.character);
   }
@@ -49,6 +49,7 @@ export class CharacterSelectScreen extends Screen {
   }
 
   preview(id) {
+    this.selectedId = id;
     const g = this.game;
     const c = g.data.character(id);
     const kart = g.data.kart(g.session.kart);
