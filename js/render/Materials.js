@@ -80,7 +80,7 @@ export class MaterialLibrary {
         case 'stone':
           return new THREE.MeshStandardMaterial({ map: TextureFactory.bricks(this.theme.stoneColor || '#8f8578', '#4a433c'), roughness: 0.9 });
         case 'neon':
-          return new THREE.MeshStandardMaterial({ color: '#1a1030', emissive: new THREE.Color(this.theme.neon || '#ff2bd6'), emissiveIntensity: 1.8, roughness: 0.3, metalness: 0.6 });
+          return new THREE.MeshStandardMaterial({ color: '#1a1030', emissive: new THREE.Color(this.theme.neon || '#ff2bd6'), emissiveIntensity: 0.35, roughness: 0.3, metalness: 0.6 });
         case 'glass':
           return new THREE.MeshStandardMaterial({ color: '#9fe8ff', transparent: true, opacity: 0.28, roughness: 0.05, metalness: 0.2, emissive: new THREE.Color('#00b8d4'), emissiveIntensity: 0.25, depthWrite: false, side: THREE.DoubleSide });
         case 'hedge':

@@ -556,6 +556,7 @@ export function stepKart(k, dt, ctx) {
     }
     if (col.dynamic && col.dynamic.hit) applyHit(k, col.dynamic.hit, col.dynamic.hazard || null, ctx);
   }
+  if (col.soft && col.soft.hit) applyHit(k, col.soft.hit, col.soft.hazard || null, ctx);
 
   // ----- Muertes / caídas
   const tr = ctx.track;

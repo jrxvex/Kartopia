@@ -3,6 +3,7 @@
 // castillo, faros, templos, arcos, barcos, cristales gigantes, hologramas y carteles.
 import * as THREE from 'three';
 import { TextureFactory } from '../render/TextureFactory.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ModelBuilder, sharedMaterials, G, roundedBox } from '../models/ModelBuilder.js';
 import { Random } from '../core/Random.js';
 
@@ -308,6 +309,120 @@ export class LandmarkKit {
     return this.add(g);
   }
 
+  /**
+   * Edificios fusionados por variante de fachada (pocas llamadas de dibujo). Cada edificio:
+   * {x, y, z, w, d, h, rot, color?, sign?, signColor?}; su cara +Z local mira hacia la pista.
+   * Las ventanas mantienen su tamaño real (≈4 × 3.5 m) sea cual sea el edificio.
+   */
+  cityBuildings(list, opts = {}) {
+    if (!list.length) return null;
+    const night = !!this.theme.night;
+    const variants = opts.variants ?? 3;
+    const palette = opts.colors || (night ? ['#626b78', '#58607a', '#6d6470', '#4f6766', '#707884'] : ['#b0bec5', '#9fa8da', '#bcaaa4', '#80cbc4', '#cfd8dc']);
+    const neon = opts.neon || ['#ff2bd6', '#00e5ff', '#ffea00', '#76ff03'];
+    const buckets = Array.from({ length: variants }, () => []);
+    const deco = new ModelBuilder();
+    const col = new THREE.Color();
+    const root = new THREE.Group();
+    const m = new THREE.Matrix4();
+    list.forEach((b, n) => {
+      const geo = new THREE.BoxGeometry(b.w, b.h, b.d);
+      const uv = geo.attributes.uv;
+      const pos = geo.attributes.position;
+      const nrm = geo.attributes.normal;
+      for (let i = 0; i < uv.count; i++) {
+        if (Math.abs(nrm.getY(i)) > 0.5) {
+          uv.setXY(i, 0.01, 0.995);
+          continue;
+        }
+        const a = Math.abs(nrm.getX(i)) > 0.5 ? pos.getZ(i) : pos.getX(i);
+        uv.setXY(i, a / 15 + n * 0.37, (pos.getY(i) + b.h / 2) / 50);
+      }
+      col.set(b.color || palette[n % palette.length]);
+      const c = new Float32Array(pos.count * 3);
+      for (let i = 0; i < pos.count; i++) {
+        c[i * 3] = col.r;
+        c[i * 3 + 1] = col.g;
+        c[i * 3 + 2] = col.b;
+      }
+      geo.setAttribute('color', new THREE.BufferAttribute(c, 3));
+      geo.rotateY(b.rot || 0);
+      geo.translate(b.x, b.y + b.h / 2, b.z);
+      buckets[n % variants].push(geo);
+      if (opts.roof === false) return;
+      m.makeRotationY(b.rot || 0).setPosition(b.x, b.y, b.z);
+      deco.add(G.box(b.w + 0.6, 0.8, b.d + 0.6), 'matte', '#455a64', { pos: [0, b.h + 0.4, 0], matrix: m });
+      deco.add(G.box(b.w * 0.35, 1.8, b.d * 0.3), 'metal', '#90a4ae', { pos: [b.w * 0.18, b.h + 1.7, -b.d * 0.15], matrix: m });
+      if (n % 3 === 0) deco.add(G.cyl(1.6, 1.6, 3, 10), 'matte', '#6d4c41', { pos: [-b.w * 0.25, b.h + 2.3, b.d * 0.2], matrix: m });
+      if (b.h > 34) {
+        deco.add(G.cyl(0.15, 0.3, 9, 6), 'metal', '#b0bec5', { pos: [0, b.h + 5.3, 0], matrix: m });
+        deco.add(G.sphere(0.45, 8, 6), 'glow', '#ff1744', { pos: [0, b.h + 10, 0], matrix: m }, 4);
+      }
+      if (night && n % 2 === 1) {
+        const nc = neon[n % neon.length];
+        deco.add(G.box(b.w + 0.3, 0.35, b.d + 0.3), 'glow', nc, { pos: [0, b.h * 0.62, 0], matrix: m }, 2.6);
+        deco.add(G.box(b.w + 0.35, 0.3, b.d + 0.35), 'glow', nc, { pos: [0, b.h - 0.2, 0], matrix: m }, 2.6);
+      }
+    });
+    for (let v = 0; v < variants; v++) {
+      if (!buckets[v].length) continue;
+      const tex = TextureFactory.windows(`${this.track.id}-v${v}`, night ? 0.36 : 0.25, opts.tint || this.theme.windowTint || '#ffd98a');
+      const map = tex.map.clone();
+      const em = tex.emissive.clone();
+      for (const t of [map, em]) {
+        t.wrapS = t.wrapT = THREE.RepeatWrapping;
+        t.needsUpdate = true;
+      }
+      const mat = new THREE.MeshStandardMaterial({ map, vertexColors: true, emissive: new THREE.Color('#ffffff'), emissiveMap: em, emissiveIntensity: night ? 0.95 : 0.1, roughness: 0.55, metalness: 0.25 });
+      const merged = mergeGeometries(buckets[v], false);
+      for (const g of buckets[v]) g.dispose();
+      const mesh = new THREE.Mesh(merged, mat);
+      mesh.name = 'buildings';
+      root.add(mesh);
+    }
+    if (deco.parts.size) root.add(deco.build(sharedMaterials(), { castShadow: false }));
+    // Rótulos luminosos en la fachada que da a la pista
+    for (const b of list) {
+      if (!b.sign) continue;
+      const tex = TextureFactory.neonSign(b.sign, b.signColor || '#ff4081');
+      const w = Math.min(b.w * 0.8, 16);
+      const sign = new THREE.Mesh(new THREE.PlaneGeometry(w, w * 0.375), new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color('#ffffff').multiplyScalar(1.6) }));
+      const g = new THREE.Group();
+      g.position.set(b.x, b.y, b.z);
+      g.rotation.y = b.rot || 0;
+      sign.position.set(0, Math.min(b.h * 0.55, 18), b.d / 2 + 0.3);
+      g.add(sign);
+      root.add(g);
+    }
+    root.traverse((o) => {
+      if (o.isMesh) {
+        o.castShadow = opts.shadows !== false && o.name === 'buildings';
+        o.receiveShadow = o.name === 'buildings';
+      }
+    });
+    this.tr.root.add(root);
+    return root;
+  }
+
+  /** Horizonte urbano: anillo de rascacielos lejanos sin colisión. */
+  skyline(cx, cz, rMin, rMax, count, opts = {}) {
+    const list = [];
+    for (let i = 0; i < count; i++) {
+      const a = this.rng.range(0, Math.PI * 2);
+      const r = this.rng.range(rMin, rMax);
+      list.push({
+        x: cx + Math.cos(a) * r,
+        z: cz + Math.sin(a) * r,
+        y: opts.y ?? -2,
+        w: this.rng.range(22, 48),
+        d: this.rng.range(22, 48),
+        h: this.rng.range(opts.hMin ?? 45, opts.hMax ?? 150),
+        rot: this.rng.range(0, Math.PI),
+      });
+    }
+    return this.cityBuildings(list, { ...opts, shadows: false });
+  }
+
   billboard(x, z, rot, text, color = '#ff4081', size = 14, height = 10) {
     const y = this.ground(x, z);
     const g = new THREE.Group();
@@ -322,6 +437,147 @@ export class LandmarkKit {
     const panel = new THREE.Mesh(new THREE.PlaneGeometry(size, size * 0.375), new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color('#ffffff').multiplyScalar(1.5), side: THREE.DoubleSide }));
     panel.position.y = height + size * 0.19;
     g.add(panel);
+    return this.add(g);
+  }
+
+  // ------------------------------------------------------------------------------ Bloques fusionados
+  /** Material de bloque por estilo (compartido entre llamadas). */
+  blockMaterial(style = 'stone', color = null) {
+    const key = `block:${style}:${color}`;
+    if (this.matCache.has(key)) return this.matCache.get(key);
+    let mat;
+    switch (style) {
+      case 'sand':
+        mat = new THREE.MeshStandardMaterial({ map: TextureFactory.bricks(color || '#e0c48a', '#b89a62'), roughness: 0.95 });
+        break;
+      case 'brick':
+        mat = new THREE.MeshStandardMaterial({ map: TextureFactory.bricks(color || '#a1664a', '#5d3a2a'), roughness: 0.9 });
+        break;
+      case 'castle':
+        mat = new THREE.MeshStandardMaterial({ map: TextureFactory.bricks(color || '#5b5350', '#2b2523'), roughness: 0.9 });
+        break;
+      case 'rock':
+        mat = new THREE.MeshStandardMaterial({ map: TextureFactory.rock(color || this.theme.rockColor || '#8a8278'), roughness: 1, flatShading: true });
+        break;
+      case 'wood':
+        mat = new THREE.MeshStandardMaterial({ map: TextureFactory.wood(color || '#8d6e4f'), roughness: 0.85 });
+        break;
+      default:
+        mat = new THREE.MeshStandardMaterial({ map: TextureFactory.bricks(color || this.theme.stoneColor || '#8f8578', '#4a433c'), roughness: 0.9 });
+    }
+    this.matCache.set(key, mat);
+    return mat;
+  }
+
+  /**
+   * Fusiona muchas cajas texturizadas en una sola malla (UV proporcionales al tamaño).
+   * boxes: [{x, y, z, w, h, d, rot}] con y en la base de la caja.
+   */
+  mergedBoxes(boxes, style = 'stone', color = null, opts = {}) {
+    if (!boxes.length) return null;
+    const geos = boxes.map((b) => {
+      const geo = new THREE.BoxGeometry(b.w, b.h, b.d);
+      const uv = geo.attributes.uv;
+      const p = geo.attributes.position;
+      const nrm = geo.attributes.normal;
+      const sc = opts.uvScale ?? 4;
+      for (let i = 0; i < uv.count; i++) {
+        const nx = Math.abs(nrm.getX(i));
+        const ny = Math.abs(nrm.getY(i));
+        const a = nx > 0.5 ? p.getZ(i) : p.getX(i);
+        const c = ny > 0.5 ? p.getZ(i) : p.getY(i);
+        uv.setXY(i, a / sc, c / sc);
+      }
+      if (b.rx || b.rz) geo.applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(b.rx || 0, 0, b.rz || 0)));
+      geo.rotateY(b.rot || 0);
+      geo.translate(b.x, b.y + b.h / 2, b.z);
+      return geo;
+    });
+    const merged = mergeGeometries(geos, false);
+    for (const g of geos) g.dispose();
+    const mesh = new THREE.Mesh(merged, this.blockMaterial(style, color));
+    return this.add(mesh, opts.shadow !== false);
+  }
+
+  /**
+   * Pasaje cubierto (templo, salón de castillo) alrededor de un tramo de la pista entre u0 y u1:
+   * muros laterales, techo y portadas con columnas en ambos extremos. Pensado para tramos con
+   * el indicador de túnel, cuyo arco interior dibuja TrackRenderer.
+   */
+  passage(u0, u1, opts = {}) {
+    const tr = this.track;
+    const s0 = tr.sAtU(u0);
+    const span = tr.forwardDistance(s0, tr.sAtU(u1));
+    const thick = opts.thickness ?? 5;
+    const height = opts.height ?? 12;
+    const step = 6;
+    const boxes = [];
+    let maxHW = 0;
+    for (let d = 0; d <= span; d += 2) maxHW = Math.max(maxHW, tr.width[tr.indexAtS(s0 + d)] * 0.5);
+    const inner = maxHW + tr.curbWidth + 1.3;
+    for (let d = 0; d < span; d += step) {
+      const s = tr.wrapS(s0 + d + step / 2);
+      const c = tr.pointAt(s, 0);
+      const rot = tr.headingAt(s);
+      for (const side of [-1, 1]) {
+        const p = tr.pointAt(s, side * (inner + thick / 2));
+        boxes.push({ x: p.x, y: c.y - 1, z: p.z, w: thick, h: height + 1, d: step + 0.6, rot });
+      }
+      boxes.push({ x: c.x, y: c.y + 8.2, z: c.z, w: inner * 2 + thick * 2, h: height - 8.2 + 0.8, d: step + 0.6, rot });
+    }
+    // Portadas
+    const fronts = [];
+    for (const [s, dir] of [[s0, -1], [tr.wrapS(s0 + span), 1]]) {
+      const c = tr.pointAt(s, 0);
+      const rot = tr.headingAt(s);
+      const fx = Math.sin(rot) * dir;
+      const fz = Math.cos(rot) * dir;
+      for (const side of [-1, 1]) {
+        const p = tr.pointAt(s, side * (inner + thick * 0.35));
+        fronts.push({ x: p.x + fx * 1.2, y: c.y - 1, z: p.z + fz * 1.2, w: thick * 0.9, h: height + 4, d: 3, rot });
+        const q = tr.pointAt(s, side * (inner + thick + 3));
+        fronts.push({ x: q.x + fx * 0.5, y: c.y - 1, z: q.z + fz * 0.5, w: 4, h: height * 0.75, d: 4, rot });
+      }
+      fronts.push({ x: c.x + fx * 1.4, y: c.y + height, z: c.z + fz * 1.4, w: inner * 2 + thick * 2.6, h: 3.2, d: 3.6, rot });
+      if (opts.glow) {
+        const eye = new THREE.Mesh(new THREE.SphereGeometry(1.1, 12, 10), this.glow(opts.glow, 3));
+        eye.position.set(c.x + fx * 3.3, c.y + height + 1.6, c.z + fz * 3.3);
+        this.add(eye, false);
+      }
+      if (opts.torches !== false) {
+        for (const side of [-1, 1]) {
+          const p = tr.pointAt(s, side * (inner - 0.6));
+          this.light(p.x + fx * 2, c.y + 4, p.z + fz * 2, opts.torchColor || '#ffb74d', 1.2, 22);
+        }
+      }
+    }
+    this.mergedBoxes(boxes, opts.style || 'stone', opts.color);
+    this.mergedBoxes(fronts, opts.style || 'stone', opts.accent || opts.color);
+    return { inner, span };
+  }
+
+  /** Formación rocosa (pila de rocas facetadas) — mesas, agujas y peñascos. */
+  rockFormation(x, z, opts = {}) {
+    const y = opts.y ?? this.ground(x, z) - 1;
+    const h = opts.height ?? 18;
+    const r = opts.radius ?? 7;
+    const layers = opts.layers ?? 4;
+    const b = new ModelBuilder();
+    for (let i = 0; i < layers; i++) {
+      const t = i / layers;
+      const rr = r * (1 - t * (opts.taper ?? 0.35)) * this.rng.range(0.85, 1.1);
+      const lh = (h / layers) * 1.25;
+      b.add(G.dodeca(1, 0), 'matte', opts.color || this.theme.rockColor || '#9c8068', {
+        pos: [this.rng.range(-0.8, 0.8), (i + 0.5) * (h / layers), this.rng.range(-0.8, 0.8)],
+        scale: [rr, lh * 0.7, rr * this.rng.range(0.8, 1.15)],
+        rot: [0, this.rng.range(0, 6), 0],
+      });
+    }
+    const g = b.build(sharedMaterials(), { castShadow: true, receiveShadow: true });
+    g.position.set(x, y, z);
+    g.traverse((o) => {
+      if (o.isMesh) o.material = this.rockMat || (this.rockMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }));
+    });
     return this.add(g);
   }
 

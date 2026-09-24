@@ -389,6 +389,7 @@ export class ParticleManager {
       firefly: { rate: 10, color: '#d4ff6b', size: [0.25, 0.25], alpha: 1, life: [2, 4], vel: { x: 0, y: 0.3, z: 0 }, gravity: 0, additive: true, intensity: 3, box: 35, yMin: 0.5, yMax: 5 },
       leaves: { rate: 10, color: '#8bc34a', color2: '#cddc39', size: [0.3, 0.3], alpha: 0.9, life: [3, 5], vel: { x: 1.2, y: -1.2, z: 0.5 }, gravity: 0, box: 35, yMin: 3, yMax: 14 },
       data: { rate: 30, color: '#00e5ff', color2: '#d500f9', size: [0.22, 0.05], alpha: 1, life: [1.5, 3], vel: { x: 0, y: 3, z: 0 }, gravity: 0, additive: true, intensity: 2.5, box: 50, yMin: -6, yMax: 4 },
+      dust: { rate: 26, color: '#e9cf98', size: [0.16, 0.12], alpha: 0.55, life: [2, 4], vel: { x: 3.2, y: 0.25, z: 0.8 }, gravity: 0, box: 45, yMin: 0.3, yMax: 6 },
       sparkle: { rate: 16, color: '#ffffff', size: [0.18, 0.05], alpha: 1, life: [1, 2], vel: { x: 0, y: 0.5, z: 0 }, gravity: 0, additive: true, intensity: 2, box: 40, yMin: 1, yMax: 12 },
     };
     const p = presets[kind];

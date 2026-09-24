@@ -300,6 +300,7 @@ export class CollisionWorld {
     out.depth = 0;
     out.kind = null;
     out.dynamic = null;
+    out.soft = null;
     const stamp = ++this.stamp;
     const inv = this.inv;
     const ix0 = Math.floor((p.x - radius) * inv);
@@ -368,6 +369,14 @@ export class CollisionWorld {
         const c = this.dynamic[i];
         if (!c.active) continue;
         if (p.y > c.y1 || top < c.y0) continue;
+        if (c.soft) {
+          // obstáculo ligero (rodadora…): golpea pero no empuja
+          const dx = p.x - c.x;
+          const dz = p.z - c.z;
+          const rr = radius + c.r;
+          if (dx * dx + dz * dz < rr * rr) out.soft = c;
+          continue;
+        }
         if (this._resolveCircle(p, radius, c, out)) out.dynamic = c;
       }
     }

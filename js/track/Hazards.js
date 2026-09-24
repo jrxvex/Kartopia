@@ -19,8 +19,8 @@ class Hazard {
     this.time = 0;
   }
 
-  addCollider(r, hit, kind = 'hazard') {
-    const c = { active: true, x: 0, z: 0, r, y0: 0, y1: 0, kind, hit, hazard: this };
+  addCollider(r, hit, kind = 'hazard', soft = false) {
+    const c = { active: true, x: 0, z: 0, r, y0: 0, y1: 0, kind, hit, hazard: this, soft };
     this.world.addDynamic(c);
     this.colliders.push(c);
     return c;
@@ -45,8 +45,16 @@ class MoverHazard extends Hazard {
     this.pos = { x: 0, y: 0, z: 0 };
     this.heading = 0;
     this.spin = 0;
-    this.radius = p.radius ?? 1.6;
-    this.collider = this.addCollider(this.radius, p.hit || 'tumble', p.model || 'mover');
+    this.radius = p.radius ?? (p.model === 'car' ? 1.4 : p.model === 'bus' ? 1.5 : 1.6);
+    // Vehículos largos: varios colisionadores repartidos a lo largo de la carrocería
+    const len = p.length ?? (p.model === 'bus' ? 7.5 : p.model === 'car' ? 4.2 : 0);
+    const n = len > this.radius * 2.2 ? Math.ceil(len / (this.radius * 2)) : 1;
+    this.parts = [];
+    for (let k = 0; k < n; k++) {
+      const off = n === 1 ? 0 : -len / 2 + this.radius + ((len - 2 * this.radius) * k) / (n - 1);
+      this.parts.push({ off, c: this.addCollider(this.radius, p.hit || 'tumble', p.model || 'mover', p.soft ?? p.model === 'tumbleweed') });
+    }
+    this.collider = this.parts[0].c;
     this.speed = p.speed ?? 10;
     this.phase = p.phase ?? 0;
     if (p.path) {
@@ -109,11 +117,15 @@ class MoverHazard extends Hazard {
       this.s = s;
     }
     this.spin = time * this.speed / Math.max(0.3, this.radius);
-    const c = this.collider;
-    c.x = this.pos.x;
-    c.z = this.pos.z;
-    c.y0 = this.pos.y - 0.5;
-    c.y1 = this.pos.y + (p.height ?? 2.2);
+    const fx = Math.sin(this.heading);
+    const fz = Math.cos(this.heading);
+    for (const part of this.parts) {
+      const c = part.c;
+      c.x = this.pos.x + fx * part.off;
+      c.z = this.pos.z + fz * part.off;
+      c.y0 = this.pos.y - 0.5;
+      c.y1 = this.pos.y + (p.height ?? 2.2);
+    }
   }
 
   buildVisual() {
@@ -208,6 +220,20 @@ class MoverHazard extends Hazard {
       ball.position.y = this.radius;
       ball.name = 'roll';
       g.add(ball);
+    } else if (m === 'cube') {
+      const size = this.radius * 1.5;
+      const color = new THREE.Color(this.params.color || '#00e5ff');
+      const core = new THREE.Mesh(
+        new THREE.BoxGeometry(size, size, size),
+        new THREE.MeshStandardMaterial({ color: '#0b0b1a', emissive: color, emissiveIntensity: 0.7, roughness: 0.25, metalness: 0.6, transparent: true, opacity: 0.88 }),
+      );
+      core.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(size * 1.03, size * 1.03, size * 1.03)), new THREE.LineBasicMaterial({ color: color.clone().multiplyScalar(3) })));
+      const inner = new THREE.Mesh(new THREE.OctahedronGeometry(size * 0.28, 0), new THREE.MeshBasicMaterial({ color: color.clone().multiplyScalar(2.5) }));
+      core.add(inner);
+      core.position.y = size / 2 + 0.7;
+      core.castShadow = true;
+      core.name = 'hover';
+      g.add(core);
     } else if (m === 'boulder') {
       const geo = new THREE.DodecahedronGeometry(this.radius, 1);
       const pos = geo.attributes.position;
@@ -232,6 +258,11 @@ class MoverHazard extends Hazard {
     this.object.rotation.y = this.heading;
     const roll = this.object.getObjectByName('roll');
     if (roll) roll.rotation.x = this.spin;
+    const hover = this.object.getObjectByName('hover');
+    if (hover) {
+      hover.rotation.set(this.spin * 0.15, this.spin * 0.35, 0);
+      hover.position.y = this.radius * 0.75 + 0.7 + Math.sin(this.spin * 0.5) * 0.25;
+    }
     if (this.params.model === 'crab') this.object.position.y += Math.abs(Math.sin(this.spin * 3)) * 0.15;
   }
 }

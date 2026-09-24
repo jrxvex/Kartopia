@@ -53,7 +53,7 @@
       "id": "desert-ruins",
       "name": "Ruinas del Desierto",
       "module": "desertRuins.js",
-      "description": "Dunas, un cañón estrecho, columnas milenarias y un gran salto sobre el abismo.",
+      "description": "Dunas, un cañón estrecho, columnas milenarias, un oasis y un gran salto sobre la garganta de un río.",
       "difficulty": 2,
       "color": "#ffb300",
       "accent": "#ff7043",

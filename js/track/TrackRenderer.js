@@ -344,9 +344,20 @@ export class TrackRenderer {
       mesh.receiveShadow = true;
       mesh.castShadow = true;
       this.root.add(mesh);
-      // tiras de luz en el techo
-      const lamp = buildSweep(tr, run, () => 0, [[-0.4, 7.55], [0.4, 7.55]], { vScale: 2 });
-      this.root.add(new THREE.Mesh(geoFromStrip(lamp), new THREE.MeshBasicMaterial({ color: new THREE.Color('#fff3c4').multiplyScalar(2), side: THREE.DoubleSide })));
+      // lámparas en el techo cada pocos metros
+      const lampGeo = new THREE.BoxGeometry(0.9, 0.18, 2.2);
+      const lampMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(this.theme.tunnelLight || '#fff3c4').multiplyScalar(2.2) });
+      const spots = run.filter((_, k) => k % 4 === 2);
+      const lamps = new THREE.InstancedMesh(lampGeo, lampMat, spots.length);
+      const m = new THREE.Matrix4();
+      const q = new THREE.Quaternion();
+      const up = new THREE.Vector3(0, 1, 0);
+      spots.forEach((i, n) => {
+        q.setFromAxisAngle(up, Math.atan2(tr.tx[i], tr.tz[i]));
+        m.compose(new THREE.Vector3(tr.px[i], tr.py[i] + 7.55, tr.pz[i]), q, new THREE.Vector3(1, 1, 1));
+        lamps.setMatrixAt(n, m);
+      });
+      this.root.add(lamps);
     }
   }
 
