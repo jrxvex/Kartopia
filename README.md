@@ -93,8 +93,8 @@ No hay que compilar ni instalar dependencias. Solo hace falta **servir la carpet
 local**. Si abres `index.html` con doble clic no funciona, porque el navegador bloquea los módulos.
 
 ```bash
-git clone https://github.com/jrxvex/mariocart.git
-cd mariocart
+git clone https://github.com/jrxvex/Kartopia.git
+cd Kartopia
 
 python -m http.server 8080        # con Python 3
 # o bien
@@ -247,7 +247,7 @@ velocidad, la aceleración, el manejo, el peso y el agarre fuera de pista.
 ### 📁 Estructura
 
 ```
-📦 mariocart
+📦 Kartopia
 ├── index.html          → página única: lienzos, interfaz y mapa de importación
 ├── css/                → estilos de la carga, los menús y el HUD
 ├── data/               → JSON: pilotos, karts, objetos, dificultades, circuitos y música
