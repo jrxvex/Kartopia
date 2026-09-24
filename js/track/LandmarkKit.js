@@ -664,6 +664,41 @@ export class LandmarkKit {
     return this.add(g);
   }
 
+  /** Cascada: lámina vertical con textura animada y espuma en la base. */
+  waterfall(x, z, width = 14, height = 30, opts = {}) {
+    const base = opts.y ?? this.track.waterLevel ?? this.ground(x, z);
+    const c = document.createElement('canvas');
+    c.width = 128;
+    c.height = 256;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#6cc3e0';
+    ctx.fillRect(0, 0, 128, 256);
+    for (let i = 0; i < 110; i++) {
+      ctx.fillStyle = `rgba(255,255,255,${this.rng.range(0.2, 0.85).toFixed(2)})`;
+      ctx.fillRect(this.rng.range(0, 128), this.rng.range(0, 256), this.rng.range(1, 4), this.rng.range(20, 90));
+    }
+    const tex = new THREE.CanvasTexture(c);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.repeat.set(width / 10, height / 20);
+    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false });
+    const sheet = new THREE.Mesh(new THREE.PlaneGeometry(width, height), mat);
+    sheet.position.set(x, base + height / 2, z);
+    sheet.rotation.y = opts.rot ?? 0;
+    this.add(sheet, false);
+    this.animate((dt, t) => {
+      tex.offset.y = t * 1.4;
+    });
+    const foam = new THREE.Mesh(new THREE.CircleGeometry(width * 0.7, 24), new THREE.MeshBasicMaterial({ color: '#f4fbff', transparent: true, opacity: 0.75, depthWrite: false }));
+    foam.rotation.x = -Math.PI / 2;
+    foam.position.set(x, base + 0.08, z);
+    this.add(foam, false);
+    this.animate((dt, t) => {
+      foam.scale.setScalar(1 + Math.sin(t * 3) * 0.05);
+    });
+    return sheet;
+  }
+
   // ------------------------------------------------------------------------------ Castillo
   tower(x, z, r = 5, h = 22, opts = {}) {
     const y = opts.y ?? this.ground(x, z) - 0.5;

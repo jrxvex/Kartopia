@@ -81,7 +81,8 @@ export class CameraController {
     const d = (this._desired = this._desired || new THREE.Vector3());
     d.set(kp.x - fx * dist, this.y + height, kp.z - fz * dist);
     if (this.world) {
-      this.world.groundAt(d.x, d.z, d.y + 25, g);
+      // solo el suelo cercano: un tablero superior (paso elevado, hélice) no debe atraer la cámara
+      this.world.groundAt(d.x, d.z, Math.max(d.y, kp.y) + 4, g);
       if (g.hit && d.y < g.y + 1.3) d.y = g.y + 1.3;
     }
     const l = (this._look = this._look || new THREE.Vector3());
@@ -106,7 +107,7 @@ export class CameraController {
       const r = 7.5;
       const des = new THREE.Vector3(tmp.x + Math.cos(this.orbitAngle) * r, tmp.y + 2.6, tmp.z + Math.sin(this.orbitAngle) * r);
       if (this.world) {
-        this.world.groundAt(des.x, des.z, des.y + 25, g);
+        this.world.groundAt(des.x, des.z, Math.max(des.y, tmp.y) + 4, g);
         if (g.hit && des.y < g.y + 1.2) des.y = g.y + 1.2;
       }
       this.pos.lerp(des, 1 - Math.exp(-4 * dt));
@@ -141,7 +142,7 @@ export class CameraController {
     const look = tr.pointAt(s + 30, 0);
     const pos = new THREE.Vector3(p.x, p.y + h, p.z);
     if (this.world) {
-      this.world.groundAt(pos.x, pos.z, pos.y + 40, g);
+      this.world.groundAt(pos.x, pos.z, pos.y + 6, g);
       if (g.hit && pos.y < g.y + 3) pos.y = g.y + 3;
     }
     const lk = new THREE.Vector3(look.x, look.y + 2, look.z);

@@ -387,7 +387,8 @@ class PendulumHazard extends Hazard {
     this.radius = p.radius ?? 1.4;
     this.angle = 0;
     this.bob = { x: 0, y: 0, z: 0 };
-    this.collider = this.addCollider(this.radius, p.hit || 'tumble', 'pendulum');
+    // blando: derriba al kart al paso sin barrerlo de lado a lado
+    this.collider = this.addCollider(this.radius, p.hit || 'tumble', 'pendulum', p.soft ?? true);
     this.halfWidth = track.halfWidth(i);
     this.update(0);
   }

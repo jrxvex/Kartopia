@@ -40,10 +40,10 @@ export default {
     ...helix(), // 11-23 hélice
     [-202, 20, -5],
     [-192, 20.5, 45], // 25
-    [-160, 21, 88], // recta elevada
-    [-100, 21, 98],
-    [-40, 21, 98],
-    [20, 20.5, 95],
+    [-160, 21, 88, { w: 19 }], // recta elevada
+    [-100, 21, 98, { w: 20 }],
+    [-40, 21, 98, { w: 20 }],
+    [20, 20.5, 95, { w: 19 }],
     [62, 18.5, 78], // 30
     [84, 15.5, 40],
     [88, 12.5, 0], // salto
@@ -103,7 +103,8 @@ export default {
     const across = (u, half, extra = {}) => {
       const a = api.pointAt(u, -half);
       const b = api.pointAt(u, half);
-      api.hazard({ type: 'mover', model: 'cube', path: [[a.x, a.z], [b.x, b.z]], hit: 'spin', radius: 1.6, height: 3, ...extra });
+      // cubos "blandos": hacen trompear pero no empujan fuera de la pista
+      api.hazard({ type: 'mover', model: 'cube', path: [[a.x, a.z], [b.x, b.z]], hit: 'spin', soft: true, radius: 1.6, height: 3, ...extra });
     };
     across(8.4, 5.5, { speed: 4.5, phase: 0.1, color: '#ff2bd6' });
     across(9.3, 5.5, { speed: 5, phase: 0.6, color: '#00e5ff' });

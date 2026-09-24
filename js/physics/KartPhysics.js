@@ -612,12 +612,20 @@ export function resolveKartCollisions(karts, ctx) {
       const minD = a.radius + b.radius;
       const d2 = dx * dx + dz * dz;
       if (d2 >= minD * minD) continue;
+      const aPow = a.starTime > 0 || a.comet > 0;
+      const bPow = b.starTime > 0 || b.comet > 0;
+      if (aPow !== bPow) {
+        // Un kart invencible atraviesa al otro y lo derriba en el sitio (sin arrastrarlo)
+        if (aPow && applyHit(b, 'tumble', a, ctx)) ctx.events.emit('item:hit', { attacker: a, victim: b, item: a.comet > 0 ? 'comet-rush' : 'prism-aura' });
+        if (bPow && applyHit(a, 'tumble', b, ctx)) ctx.events.emit('item:hit', { attacker: b, victim: a, item: b.comet > 0 ? 'comet-rush' : 'prism-aura' });
+        continue;
+      }
       const d = Math.sqrt(d2);
       const nx = d > 1e-4 ? dx / d : 1;
       const nz = d > 1e-4 ? dz / d : 0;
       const overlap = minD - d;
-      const ma = a.params.weight * (a.starTime > 0 || a.comet > 0 ? 6 : 1);
-      const mb = b.params.weight * (b.starTime > 0 || b.comet > 0 ? 6 : 1);
+      const ma = a.params.weight;
+      const mb = b.params.weight;
       const wa = mb / (ma + mb);
       const wb = ma / (ma + mb);
       a.pos.x -= nx * overlap * wa;
@@ -646,12 +654,6 @@ export function resolveKartCollisions(karts, ctx) {
             z: (a.pos.z + b.pos.z) / 2,
           });
         }
-      }
-      if (a.starTime > 0 || a.comet > 0) {
-        if (applyHit(b, 'tumble', a, ctx)) ctx.events.emit('item:hit', { attacker: a, victim: b, item: a.comet > 0 ? 'comet-rush' : 'prism-aura' });
-      }
-      if (b.starTime > 0 || b.comet > 0) {
-        if (applyHit(a, 'tumble', b, ctx)) ctx.events.emit('item:hit', { attacker: b, victim: a, item: b.comet > 0 ? 'comet-rush' : 'prism-aura' });
       }
     }
   }
