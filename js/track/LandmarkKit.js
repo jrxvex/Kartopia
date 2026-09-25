@@ -64,6 +64,46 @@ export class LandmarkKit {
     this.track.pointLights.push({ x, y, z, color, intensity, distance });
   }
 
+  /** Plano con un rótulo luminoso. Todos los rótulos comparten un atlas (ver finalize). */
+  signMesh(text, color, width) {
+    if (!this.signMat) {
+      this.signMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffffff').multiplyScalar(1.55), side: THREE.DoubleSide });
+      this.signList = [];
+      this.signSlots = new Map();
+      this.signGeos = [];
+    }
+    const key = `${text}\u0000${color}`;
+    if (!this.signSlots.has(key)) {
+      this.signSlots.set(key, this.signList.length);
+      this.signList.push({ text, color });
+    }
+    const geo = new THREE.PlaneGeometry(width, width * 0.375);
+    this.signGeos.push({ geo, slot: this.signSlots.get(key) });
+    return new THREE.Mesh(geo, this.signMat);
+  }
+
+  /** Crea los recursos compartidos (atlas de rótulos) una vez colocados todos los monumentos. */
+  finalize() {
+    if (!this.signMat || this.signMat.map) return;
+    const { texture, rects } = TextureFactory.signAtlas(this.signList);
+    this.signMat.map = texture;
+    this.signMat.needsUpdate = true;
+    for (const { geo, slot } of this.signGeos) {
+      const [u0, v0, u1, v1] = rects[slot];
+      const uv = geo.attributes.uv;
+      for (let i = 0; i < uv.count; i++) uv.setXY(i, u0 + uv.getX(i) * (u1 - u0), v0 + uv.getY(i) * (v1 - v0));
+      uv.needsUpdate = true;
+    }
+    this.signGeos = [];
+  }
+
+  dispose() {
+    if (this.signMat) {
+      this.signMat.map?.dispose();
+      this.signMat.dispose();
+    }
+  }
+
   styledBox(w, h, d, style = 'stone', color = null) {
     let mat;
     switch (style) {
@@ -294,8 +334,7 @@ export class LandmarkKit {
       });
     }
     if (opts.sign) {
-      const tex = TextureFactory.neonSign(opts.sign, opts.signColor || '#ff4081');
-      const sign = new THREE.Mesh(new THREE.PlaneGeometry(Math.min(w * 0.9, 18), Math.min(w * 0.9, 18) * 0.375), new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color('#ffffff').multiplyScalar(1.6) }));
+      const sign = this.signMesh(opts.sign, opts.signColor || '#ff4081', Math.min(w * 0.9, 18));
       sign.position.set(0, h * (opts.signHeight ?? 0.7), d / 2 + 0.3);
       g.add(sign);
     }
@@ -384,9 +423,7 @@ export class LandmarkKit {
     // Rótulos luminosos en la fachada que da a la pista
     for (const b of list) {
       if (!b.sign) continue;
-      const tex = TextureFactory.neonSign(b.sign, b.signColor || '#ff4081');
-      const w = Math.min(b.w * 0.8, 16);
-      const sign = new THREE.Mesh(new THREE.PlaneGeometry(w, w * 0.375), new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color('#ffffff').multiplyScalar(1.6) }));
+      const sign = this.signMesh(b.sign, b.signColor || '#ff4081', Math.min(b.w * 0.8, 16));
       const g = new THREE.Group();
       g.position.set(b.x, b.y, b.z);
       g.rotation.y = b.rot || 0;
@@ -433,8 +470,7 @@ export class LandmarkKit {
       post.position.set(s * size * 0.3, height / 2, 0);
       g.add(post);
     }
-    const tex = TextureFactory.neonSign(text, color);
-    const panel = new THREE.Mesh(new THREE.PlaneGeometry(size, size * 0.375), new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color('#ffffff').multiplyScalar(1.5), side: THREE.DoubleSide }));
+    const panel = this.signMesh(text, color, size);
     panel.position.y = height + size * 0.19;
     g.add(panel);
     return this.add(g);
@@ -775,27 +811,21 @@ export class LandmarkKit {
     const g = new THREE.Group();
     g.position.set(x, y, z);
     g.rotation.y = rot;
-    const hull = new THREE.Mesh(roundedBox(4, 1.6, 11, 0.6), this.mat(color));
-    hull.position.y = 0.6;
-    g.add(hull);
-    const deck = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.2, 9.5), this.mat('#d7ccc8'));
-    deck.position.y = 1.45;
-    g.add(deck);
-    const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.6, 2, 3.4), this.mat('#fafafa'));
-    cabin.position.set(0, 2.5, -1.5);
-    g.add(cabin);
-    const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.15, 9, 6), this.mat('#8d6e4f'));
-    mast.position.set(0, 5.5, 1.5);
-    g.add(mast);
+    // Casco, cubierta, cabina, mástil y vela con color por vértice: una sola malla por barco
+    const b = new ModelBuilder();
+    b.add(roundedBox(4, 1.6, 11, 0.6), 'matte', color, { pos: [0, 0.6, 0] });
+    b.add(G.box(3.4, 0.2, 9.5), 'matte', '#d7ccc8', { pos: [0, 1.45, 0] });
+    b.add(G.box(2.6, 2, 3.4), 'matte', '#fafafa', { pos: [0, 2.5, -1.5] });
+    b.add(G.cyl(0.12, 0.15, 9, 6), 'matte', '#8d6e4f', { pos: [0, 5.5, 1.5] });
     const sailShape = new THREE.Shape();
     sailShape.moveTo(0, 0);
     sailShape.lineTo(0, 7.5);
     sailShape.lineTo(4, 0.5);
     sailShape.closePath();
-    const sail = new THREE.Mesh(new THREE.ShapeGeometry(sailShape), this.mat('#ffffff', { side: THREE.DoubleSide }));
-    sail.position.set(0, 2, 1.5);
-    sail.rotation.y = Math.PI / 2;
-    g.add(sail);
+    const sail = new THREE.ExtrudeGeometry(sailShape, { depth: 0.06, bevelEnabled: false });
+    sail.translate(0, 0, -0.03);
+    b.add(sail, 'matte', '#ffffff', { pos: [0, 2, 1.5], rot: [0, Math.PI / 2, 0] });
+    g.add(b.build(sharedMaterials()));
     const ph = this.rng.range(0, 6);
     this.animate((dt, t) => {
       g.position.y = y + Math.sin(t * 1.2 + ph) * 0.25;
@@ -808,7 +838,7 @@ export class LandmarkKit {
     const y = opts.y ?? this.ground(x, z);
     const g = new THREE.Group();
     g.position.set(x, y, z);
-    const mat = new THREE.MeshStandardMaterial({ color, emissive: new THREE.Color(color), emissiveIntensity: 0.9, roughness: 0.1, metalness: 0.2, transparent: true, opacity: 0.85 });
+    const mat = this.mat(color, { emissive: new THREE.Color(color), emissiveIntensity: 0.9, roughness: 0.1, metalness: 0.2 });
     for (let i = 0; i < 5; i++) {
       const hh = h * (1 - i * 0.15);
       const c = new THREE.Mesh(new THREE.OctahedronGeometry(1, 0), mat);
@@ -831,11 +861,7 @@ export class LandmarkKit {
     g.add(ring);
     const ring2 = new THREE.Mesh(new THREE.TorusGeometry(r * 0.85, 0.15, 6, 48), mat);
     g.add(ring2);
-    const speed = opts.speed ?? 0.4;
-    this.animate((dt) => {
-      ring.rotation.z += dt * speed;
-      ring2.rotation.z -= dt * speed * 1.5;
-    });
+    // (un toro girando en su propio plano se ve igual: estático, así se fusiona con el resto)
     return this.add(g, false);
   }
 
@@ -858,9 +884,7 @@ export class LandmarkKit {
     const beam = new THREE.Mesh(new THREE.BoxGeometry(hw * 2 + 0.6, 0.6, 0.6), frame);
     beam.position.y = height + 2;
     g.add(beam);
-    const tex = TextureFactory.neonSign(text, color);
-    const w = Math.min(hw * 1.6, 16);
-    const panel = new THREE.Mesh(new THREE.PlaneGeometry(w, w * 0.375), new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color('#ffffff').multiplyScalar(1.5), side: THREE.DoubleSide }));
+    const panel = this.signMesh(text, color, Math.min(hw * 1.6, 16));
     panel.position.set(0, height, -0.4);
     panel.rotation.y = Math.PI;
     g.add(panel);

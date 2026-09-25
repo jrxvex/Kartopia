@@ -104,6 +104,16 @@ body {
   z-index: 2;
 }
 
+.fx-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  will-change: opacity;
+  background: radial-gradient(circle farthest-corner at 50% 46%, rgba(0, 0, 0, 0) 43%, #000 96%);
+}
+
 #flash {
   position: absolute;
   inset: 0;

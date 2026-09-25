@@ -24,7 +24,15 @@ export class ModelBuilder {
    * @param {number} intensity multiplicador del color (colores HDR para brillo)
    */
   add(geo, key, color, t = {}, intensity = 1) {
-    let g = geo.index ? geo.toNonIndexed() : geo.clone();
+    // Geometría indexada (los vértices compartidos se procesan una sola vez en la GPU)
+    const g = geo.clone();
+    if (!g.index) {
+      const n = g.attributes.position.count;
+      const idx = new (n > 65535 ? Uint32Array : Uint16Array)(n);
+      for (let i = 0; i < n; i++) idx[i] = i;
+      g.setIndex(new THREE.BufferAttribute(idx, 1));
+    }
+    g.clearGroups();
     if (g.attributes.uv) g.deleteAttribute('uv');
     if (g.attributes.uv1) g.deleteAttribute('uv1');
     if (!g.attributes.normal) g.computeVertexNormals();

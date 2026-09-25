@@ -96,7 +96,7 @@ class MoverHazard extends Hazard {
       hx = (b[0] - a[0]) * (forward ? 1 : -1);
       hz = (b[1] - a[1]) * (forward ? 1 : -1);
       const hf = this.track.heightfield;
-      const g = this.world.groundAt(this.pos.x, this.pos.z, 1e6, {});
+      const g = this.world.groundAt(this.pos.x, this.pos.z, 1e6, (this._ground = this._ground || {}));
       this.pos.y = g.hit ? g.y : hf ? hf.heightAt(this.pos.x, this.pos.z) || 0 : 0;
       this.heading = Math.atan2(hx, hz);
     } else {
@@ -219,6 +219,7 @@ class MoverHazard extends Hazard {
       ball.add(inner);
       ball.position.y = this.radius;
       ball.name = 'roll';
+      ball.userData.dynamic = true;
       g.add(ball);
     } else if (m === 'cube') {
       const size = this.radius * 1.5;
@@ -233,6 +234,7 @@ class MoverHazard extends Hazard {
       core.position.y = size / 2 + 0.7;
       core.castShadow = true;
       core.name = 'hover';
+      core.userData.dynamic = true;
       g.add(core);
     } else if (m === 'boulder') {
       const geo = new THREE.DodecahedronGeometry(this.radius, 1);
@@ -246,6 +248,7 @@ class MoverHazard extends Hazard {
       ball.position.y = this.radius;
       ball.castShadow = true;
       ball.name = 'roll';
+      ball.userData.dynamic = true;
       g.add(ball);
     }
     this.object = g;
@@ -466,6 +469,7 @@ class PendulumHazard extends Hazard {
     bob.position.y = -this.length;
     bob.castShadow = true;
     arm.add(bob);
+    arm.userData.dynamic = true;
     g.add(arm);
     this.arm = arm;
     this.object = g;
@@ -531,17 +535,13 @@ class FirebarHazard extends Hazard {
     );
     post.position.y = 0.8;
     g.add(post);
-    const fireMat = new THREE.MeshBasicMaterial({ color: '#ff9100' });
-    const coreMat = new THREE.MeshBasicMaterial({ color: '#fff176' });
-    const geo = new THREE.SphereGeometry(0.55, 12, 10);
-    const core = new THREE.SphereGeometry(0.3, 8, 6);
-    this.ballMeshes = [];
-    for (let k = 0; k < this.count; k++) {
-      const m = new THREE.Mesh(geo, fireMat);
-      m.add(new THREE.Mesh(core, coreMat));
-      g.add(m);
-      this.ballMeshes.push(m);
-    }
+    // Todas las bolas de la barra en una sola malla instanciada
+    const fire = new THREE.InstancedMesh(new THREE.SphereGeometry(0.55, 12, 10), new THREE.MeshBasicMaterial({ color: '#ff9100' }), this.count);
+    fire.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 1.3, 0), this.length + 1);
+    fire.userData.dynamic = true;
+    g.add(fire);
+    this.fire = fire;
+    this._m = new THREE.Matrix4();
     this.object = g;
     return g;
   }
@@ -551,11 +551,11 @@ class FirebarHazard extends Hazard {
     this.object.position.set(this.center.x, this.center.y, this.center.z);
     for (let k = 0; k < this.count; k++) {
       const b = this.balls[k];
-      const m = this.ballMeshes[k];
-      m.position.set(b.x - this.center.x, 1.3, b.z - this.center.z);
       const s = 1 + Math.sin(time * 12 + k) * 0.12;
-      m.scale.setScalar(s);
+      this._m.makeScale(s, s, s).setPosition(b.x - this.center.x, 1.3, b.z - this.center.z);
+      this.fire.setMatrixAt(k, this._m);
     }
+    this.fire.instanceMatrix.needsUpdate = true;
   }
 }
 

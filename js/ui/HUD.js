@@ -7,6 +7,25 @@ import { formatTime, clamp } from '../core/MathUtils.js';
 import { PHYSICS } from '../config.js';
 
 const DRIFT_NAMES = ['', '¡MINI-TURBO!', '¡SÚPER TURBO!', '¡ULTRA TURBO!'];
+
+/** Escribe texto solo si ha cambiado (evita repintados innecesarios). */
+function setText(el, text) {
+  if (el._text !== text) {
+    el._text = text;
+    el.textContent = text;
+  }
+}
+
+/** Cambia una variable CSS solo si su valor es distinto. */
+function setVar(el, name, value) {
+  const key = `_var${name}`;
+  if (el[key] !== value) {
+    el[key] = value;
+    el.style.setProperty(name, value);
+  }
+}
+
+const q2 = (v) => (Math.round(v * 50) / 50).toString();
 const DRIFT_CLASS = ['', 'blue', 'orange', 'purple'];
 
 export class HUD {
@@ -62,7 +81,12 @@ export class HUD {
     );
     this.root.appendChild(e.safe);
     this.minimap = new Minimap(e.minimapCanvas);
-    window.addEventListener('resize', () => this.minimap.resize());
+    this._tick = 0;
+    window.addEventListener('resize', () => {
+      this.minimap.resize();
+      this._marksW = 0;
+      if (this.rankRows) for (const r of this.rankRows.values()) r.x = null;
+    });
   }
 
   attach(race, view) {
@@ -76,6 +100,8 @@ export class HUD {
     this.lastItem = null;
     this.rouletteT = 0;
     this.rankRows = new Map();
+    this._marksW = 0;
+    this._lapCount = -1;
     const e = this.el;
     e.ranking.replaceChildren();
     e.progressMarks.replaceChildren();
@@ -195,6 +221,10 @@ export class HUD {
     const k = this.focus;
     const pr = k.progress;
     const s = this.game.settings;
+    // El HUD se repinta en la CPU (sobre todo en iOS): cada elemento se toca solo cuando cambia y
+    // lo que cambia sin parar (cronómetro, velocímetro, minimapa) se refresca a ~30 Hz.
+    this._tick = (this._tick + 1) | 0;
+    const slow = (this._tick & 1) === 0;
 
     // Vuelta y tiempo
     const lap = clamp(pr.lap, 1, race.laps);
@@ -203,7 +233,7 @@ export class HUD {
       e.lapNum.textContent = String(lap);
     }
     const t = race.phase === 'racing' || race.phase === 'finished' ? (pr.finished ? pr.finishTime : race.time) : 0;
-    e.time.textContent = formatTime(t * 1000);
+    if (slow || pr.finished) setText(e.time, formatTime(t * 1000));
     const laps = pr.lapTimes;
     if (laps.length !== this._lapCount) {
       this._lapCount = laps.length;
@@ -221,25 +251,30 @@ export class HUD {
     }
 
     // Velocidad
-    const v = Math.abs(k.forwardSpeed) * 3.6 * (s.speedUnit === 'mph' ? 0.6214 : 1);
-    e.speedVal.textContent = String(Math.round(v));
-    e.speedUnit.textContent = s.speedUnit === 'mph' ? 'mph' : 'km/h';
-    const maxV = k.params.maxSpeed * PHYSICS.BOOST_MULT * 3.6 * (s.speedUnit === 'mph' ? 0.6214 : 1);
-    e.speed.style.setProperty('--speed', String(clamp(v / maxV, 0, 1)));
+    const mph = s.speedUnit === 'mph';
+    setText(e.speedUnit, mph ? 'mph' : 'km/h');
+    if (slow) {
+      const v = Math.abs(k.forwardSpeed) * 3.6 * (mph ? 0.6214 : 1);
+      setText(e.speedVal, String(Math.round(v)));
+      const maxV = k.params.maxSpeed * PHYSICS.BOOST_MULT * 3.6 * (mph ? 0.6214 : 1);
+      setVar(e.speed, '--speed', (Math.round(clamp(v / maxV, 0, 1) * 100) / 100).toString());
+    }
     e.speed.classList.toggle('boost', k.boostTime > 0 || k.comet > 0);
     const d = k.drift;
     const th = PHYSICS.MT_THRESHOLDS;
     e.drift.classList.toggle('active', d.active);
-    e.drift.style.setProperty('--c1', String(clamp(d.charge / th[0], 0, 1)));
-    e.drift.style.setProperty('--c2', String(clamp((d.charge - th[0]) / (th[1] - th[0]), 0, 1)));
-    e.drift.style.setProperty('--c3', String(clamp((d.charge - th[1]) / (th[2] - th[1]), 0, 1)));
+    setVar(e.drift, '--c1', q2(clamp(d.charge / th[0], 0, 1)));
+    setVar(e.drift, '--c2', q2(clamp((d.charge - th[0]) / (th[1] - th[0]), 0, 1)));
+    setVar(e.drift, '--c3', q2(clamp((d.charge - th[1]) / (th[2] - th[1]), 0, 1)));
 
     // Objeto / ruleta
     this.updateItem(dt, k, race);
 
-    // Clasificación y progreso
+    // Clasificación y progreso (las marcas se mueven con transform: sin recalcular el diseño)
     const total = (race.laps + 1) * race.track.length;
     const start = race.track.length - 30;
+    if (!this._marksW) this._marksW = e.progressMarks.clientWidth;
+    const W = this._marksW;
     for (const kk of race.karts) {
       const r = this.rankRows.get(kk);
       if (!r) continue;
@@ -250,7 +285,11 @@ export class HUD {
         r.pos.textContent = `${p}º`;
       }
       const f = clamp((kk.progress.raceDistance - start) / (total - start), 0, 1);
-      r.mark.style.left = `${(f * 100).toFixed(2)}%`;
+      const x = Math.round(f * W * 2) / 2;
+      if (x !== r.x && W) {
+        r.x = x;
+        r.mark.style.transform = `translate(calc(${x}px - 50%), -50%)`;
+      }
     }
 
     // Avisos
@@ -259,10 +298,10 @@ export class HUD {
     e.threat.classList.toggle('show', targeted);
     const stuck = race.phase === 'racing' && !pr.finished && Math.abs(k.forwardSpeed) < 1 && k.grounded && k.input.throttle > 0.5;
     this._stuckT = stuck ? (this._stuckT || 0) + dt : 0;
-    e.hint.textContent = this._stuckT > 3 ? '¿Atascado? Pulsa R para el rescate' : '';
+    setText(e.hint, this._stuckT > 3 ? '¿Atascado? Pulsa R para el rescate' : '');
     e.hint.classList.toggle('show', this._stuckT > 3);
 
-    if (s.showMinimap) this.minimap.draw(race, k, this.colors);
+    if (s.showMinimap && slow) this.minimap.draw(race, k, this.colors);
   }
 
   updateItem(dt, k, race) {

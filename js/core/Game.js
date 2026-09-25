@@ -84,6 +84,7 @@ export class Game {
   applySettings() {
     const s = this.settings;
     this.renderer.applySettings(s);
+    this.speedLines.setQuality(s.quality === 'low');
     this.audio.setVolumes(s.masterVolume, s.musicVolume, s.sfxVolume);
     this.input.setControls(this.save.controls);
     this.fpsEl.classList.toggle('hidden', !s.showFps);
@@ -257,6 +258,7 @@ export class Game {
       this.bindRaceEvents(race);
       this.showcase.deactivate();
       this.renderer.setScene(view.scene, view.camera);
+      view.warmup();
       this.input.clearPressed();
       this.paused = false;
       this.state = 'race';
@@ -435,7 +437,11 @@ export class Game {
       if (this.raceAudio) this.raceAudio.update(dt);
       const fx = this.paused ? { speedLines: 0, flash: 0 } : this.view.effects;
       this.speedLines.update(dt, fx.speedLines);
-      this.flashEl.style.opacity = String(Math.min(0.8, fx.flash));
+      const flash = (Math.round(Math.min(0.8, fx.flash) * 50) / 50).toString();
+      if (flash !== this._flash) {
+        this._flash = flash;
+        this.flashEl.style.opacity = flash;
+      }
     } else if (this.state === 'menu' || this.state === 'loading') {
       this.showcase.update(dt);
       this.speedLines.update(dt, 0);

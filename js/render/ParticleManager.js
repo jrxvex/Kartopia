@@ -81,6 +81,8 @@ class Pool {
     });
     this.points = new THREE.Points(geo, mat);
     this.points.frustumCulled = false;
+    this.attrs = [this.aPos, this.aCol, this.aAlpha, this.aSize];
+    geo.setDrawRange(0, 0);
     this.points.renderOrder = additive ? 20 : 19;
   }
 
@@ -111,6 +113,8 @@ class Pool {
 
   update(dt) {
     let alive = 0;
+    let lo = this.max;
+    let hi = -1;
     const P = this.pos;
     const V = this.vel;
     for (let i = 0; i < this.max; i++) {
@@ -130,6 +134,8 @@ class Pool {
         continue;
       }
       alive++;
+      if (i < lo) lo = i;
+      hi = i;
       const i3 = i * 3;
       const d = Math.max(0, 1 - this.drag[i] * dt);
       V[i3] *= d;
@@ -147,10 +153,19 @@ class Pool {
       this.col[i3 + 2] = this.c0[i3 + 2] + (this.c1[i3 + 2] - this.c0[i3 + 2]) * t;
     }
     this.alive = alive;
-    this.aPos.needsUpdate = true;
-    this.aCol.needsUpdate = true;
-    this.aAlpha.needsUpdate = true;
-    this.aSize.needsUpdate = true;
+    // Solo se dibuja y se sube a la GPU el tramo del búfer con partículas vivas
+    const geo = this.points.geometry;
+    if (hi < 0) {
+      geo.setDrawRange(0, 0);
+      return;
+    }
+    const n = hi - lo + 1;
+    geo.setDrawRange(lo, n);
+    for (const a of this.attrs) {
+      a.clearUpdateRanges();
+      a.addUpdateRange(lo * a.itemSize, n * a.itemSize);
+      a.needsUpdate = true;
+    }
   }
 
   clear() {

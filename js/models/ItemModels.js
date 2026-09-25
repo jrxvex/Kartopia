@@ -76,8 +76,27 @@ function cached(key, fn) {
   return cache.get(key);
 }
 
-/** Crea el mesh visual de una entidad de objeto según su visualType. */
+const templates = new Map();
+
+/**
+ * Crea el mesh visual de una entidad de objeto según su visualType. Cada tipo se construye una
+ * vez y después se clona (geometrías y materiales compartidos: nada nuevo que subir a la GPU).
+ */
 export function createItemMesh(type) {
+  if (!templates.has(type)) {
+    const t = buildItemMesh(type);
+    t.traverse((o) => {
+      if (o.isMesh) o.geometry.userData.shared = true;
+    });
+    templates.set(type, t);
+  }
+  return templates.get(type).clone();
+}
+
+/** Tipos de objeto con modelo propio (para precompilar sus shaders). */
+export const ITEM_VISUALS = ['pulse-orb', 'seeker-orb', 'goo-trap', 'blast-bomb', 'orbit-crystal'];
+
+function buildItemMesh(type) {
   const mats = sharedMaterials();
   const g = new THREE.Group();
   switch (type) {
@@ -195,14 +214,31 @@ export function createShieldBubble() {
       }
     `,
   });
-  const mesh = new THREE.Mesh(new THREE.SphereGeometry(1.7, 28, 18), mat);
+  if (!shieldGeo) {
+    shieldGeo = new THREE.SphereGeometry(1.7, 28, 18);
+    shieldGeo.userData.shared = true;
+  }
+  const mesh = new THREE.Mesh(shieldGeo, mat);
   mesh.position.y = 0.75;
   mesh.renderOrder = 10;
   return mesh;
 }
+let shieldGeo = null;
 
 /** Dron de rescate que recoge al kart tras una caída. */
+let droneTemplate = null;
+/** Dron de rescate (una sola geometría compartida por todos los karts). */
 export function createRescueDrone() {
+  if (!droneTemplate) {
+    droneTemplate = buildRescueDrone();
+    droneTemplate.traverse((o) => {
+      if (o.isMesh) o.geometry.userData.shared = true;
+    });
+  }
+  return droneTemplate.clone();
+}
+
+function buildRescueDrone() {
   const b = new ModelBuilder();
   b.add(G.sphere(0.5, 16, 12), 'paint', '#ffca28', { scale: [1.2, 0.7, 1.2] });
   b.add(G.box(0.9, 0.08, 0.08), 'matte', '#37474f', { pos: [0, 0.3, 0] });

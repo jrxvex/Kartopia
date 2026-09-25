@@ -255,12 +255,7 @@ export class KartModel {
 
     // Llamas de turbo en los escapes
     this.flames = [];
-    const flameGeo = G.cone(0.13, 0.7, 10);
-    flameGeo.rotateX(-Math.PI / 2);
-    flameGeo.translate(0, 0, -0.35);
-    const inner = G.cone(0.07, 0.45, 8);
-    inner.rotateX(-Math.PI / 2);
-    inner.translate(0, 0, -0.22);
+    const { flameGeo, inner } = flameGeometry();
     this.flameMatOuter = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ff6d00').multiplyScalar(2.2), transparent: true, opacity: 0.85, depthWrite: false, blending: THREE.AdditiveBlending });
     this.flameMatInner = new THREE.MeshBasicMaterial({ color: new THREE.Color('#fff3b0').multiplyScalar(2.6), transparent: true, opacity: 0.95, depthWrite: false, blending: THREE.AdditiveBlending });
     this.exhausts = spec.exhaust.map((e) => new THREE.Vector3(e[0], e[1], e[2]));
@@ -303,11 +298,27 @@ export class KartModel {
 
   dispose() {
     this.root.traverse((o) => {
-      if (o.isMesh) o.geometry.dispose();
+      if (o.isMesh && !o.geometry.userData.shared) o.geometry.dispose();
     });
     this.flameMatOuter.dispose();
     this.flameMatInner.dispose();
   }
+}
+
+/** Conos de las llamas del escape (compartidos por todos los karts). */
+let flames = null;
+function flameGeometry() {
+  if (flames) return flames;
+  const flameGeo = G.cone(0.13, 0.7, 10);
+  flameGeo.rotateX(-Math.PI / 2);
+  flameGeo.translate(0, 0, -0.35);
+  const inner = G.cone(0.07, 0.45, 8);
+  inner.rotateX(-Math.PI / 2);
+  inner.translate(0, 0, -0.22);
+  flameGeo.userData.shared = true;
+  inner.userData.shared = true;
+  flames = { flameGeo, inner };
+  return flames;
 }
 
 export { SPECS as KART_SPECS };

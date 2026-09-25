@@ -11,6 +11,7 @@ import { buildProps } from '../models/PropModels.js';
 import { fbm2 } from '../core/Random.js';
 import { clamp, lerp } from '../core/MathUtils.js';
 import { LandmarkKit } from './LandmarkKit.js';
+import { batchStatic } from './StaticBatcher.js';
 
 function geoFromStrip(strip) {
   const g = new THREE.BufferGeometry();
@@ -77,11 +78,17 @@ export class TrackRenderer {
     this.add(props, {});
     for (const h of this.track.hazards) {
       const obj = h.buildVisual();
-      if (obj) this.add(obj, { cast: true, receive: true });
+      if (obj) {
+        obj.userData.dynamic = true;
+        this.add(obj, { cast: true, receive: true });
+      }
     }
     if (typeof this.def.landmarks === 'function') {
       this.def.landmarks(this.kit, THREE);
     }
+    this.kit.finalize();
+    // Todo lo estático, fusionado por material y zona: muchas menos llamadas de dibujo
+    this.batchStats = batchStatic(this.root, { animators: this.animators });
     return this.root;
   }
 
@@ -396,41 +403,52 @@ export class TrackRenderer {
       p.castShadow = true;
       gate.add(p);
     }
+    // Pancarta: caja del color del arco + dos caras con la textura (una sola malla por material)
     const bannerTex = TextureFactory.banner(this.def.name || 'KARTOPIA', this.theme.bannerColor || '#1565c0');
-    const banner = new THREE.Mesh(new THREE.BoxGeometry(span * 2 + 1.1, 1.8, 0.6), [
-      pillarMat,
-      pillarMat,
-      pillarMat,
-      pillarMat,
-      new THREE.MeshStandardMaterial({ map: bannerTex, roughness: 0.6, emissive: new THREE.Color('#ffffff'), emissiveMap: bannerTex, emissiveIntensity: this.theme.night ? 0.6 : 0.08 }),
-      new THREE.MeshStandardMaterial({ map: bannerTex, roughness: 0.6, emissive: new THREE.Color('#ffffff'), emissiveMap: bannerTex, emissiveIntensity: this.theme.night ? 0.6 : 0.08 }),
-    ]);
+    const bw = span * 2 + 1.1;
+    const banner = new THREE.Mesh(new THREE.BoxGeometry(bw, 1.8, 0.6), pillarMat);
     banner.position.y = 8.2;
     banner.castShadow = true;
     gate.add(banner);
+    const bannerMat = new THREE.MeshStandardMaterial({ map: bannerTex, roughness: 0.6, emissive: new THREE.Color('#ffffff'), emissiveMap: bannerTex, emissiveIntensity: this.theme.night ? 0.6 : 0.08 });
+    for (const side of [1, -1]) {
+      const face = new THREE.Mesh(new THREE.PlaneGeometry(bw, 1.8), bannerMat);
+      face.position.set(0, 8.2, side * 0.32);
+      if (side < 0) face.rotation.y = Math.PI;
+      gate.add(face);
+    }
     // semáforo
     const box = new THREE.Mesh(new THREE.BoxGeometry(3.4, 1.0, 0.5), new THREE.MeshStandardMaterial({ color: '#212121', roughness: 0.5 }));
     box.position.set(0, 6.6, -0.1);
     gate.add(box);
-    this.gateLights = [];
+    const bulbs = new THREE.InstancedMesh(new THREE.SphereGeometry(0.3, 12, 8), new THREE.MeshBasicMaterial({ color: '#ffffff' }), 4);
+    const m = new THREE.Matrix4();
     for (let i = 0; i < 4; i++) {
-      const mat = new THREE.MeshBasicMaterial({ color: '#330000' });
-      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.3, 12, 8), mat);
-      bulb.position.set(-1.2 + i * 0.8, 6.6, -0.4);
-      gate.add(bulb);
-      this.gateLights.push(mat);
+      bulbs.setMatrixAt(i, m.makeTranslation(-1.2 + i * 0.8, 6.6, -0.4));
+      bulbs.setColorAt(i, new THREE.Color('#330000'));
     }
+    bulbs.computeBoundingSphere();
+    gate.add(bulbs);
+    this.gateLights = bulbs;
     this.root.add(gate);
   }
 
   /** value: 3,2,1 (rojo progresivo), 0 (verde), null (apagado) */
   setGateLights(value) {
-    if (!this.gateLights) return;
-    this.gateLights.forEach((m, i) => {
-      if (value === 0) m.color.set('#00e676').multiplyScalar(3);
-      else if (value !== null && value !== undefined && i < 4 - value) m.color.set('#ff1744').multiplyScalar(3);
-      else m.color.set('#330000');
-    });
+    const bulbs = this.gateLights;
+    if (!bulbs) return;
+    const c = new THREE.Color();
+    for (let i = 0; i < 4; i++) {
+      if (value === 0) c.set('#00e676').multiplyScalar(3);
+      else if (value !== null && value !== undefined && i < 4 - value) c.set('#ff1744').multiplyScalar(3);
+      else c.set('#330000');
+      bulbs.setColorAt(i, c);
+    }
+    bulbs.instanceColor.needsUpdate = true;
+  }
+
+  dispose() {
+    this.kit.dispose();
   }
 
   // ---------------------------------------------------------------------------------- Terreno

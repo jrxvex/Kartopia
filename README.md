@@ -292,6 +292,7 @@ velocidad, la aceleración, el manejo, el peso y el agarre fuera de pista.
 | `Track` · `buildTrack` | `js/track/` | Trazado, colisión, terreno y progreso |
 | `ItemSystem` · `Item` | `js/items/` | Reparto, uso y comportamiento de los objetos |
 | `CameraController` · `ParticleManager` · `RaceView` | `js/render/` | Cámara, efectos y escena |
+| `mergeRig` · `batchStatic` | `js/models/RigMerger.js` · `js/track/StaticBatcher.js` | Fusionar karts y decorado para dibujarlos con pocas llamadas |
 | `AudioManager` | `js/audio/` | Música, motores y efectos |
 | `UIManager` · `HUD` | `js/ui/` | Menús y datos de carrera en pantalla |
 
@@ -348,6 +349,11 @@ Parámetros de URL para probar rápido:
 - Además se pueden ajustar por separado las sombras, el resplandor (bloom), la escala de
   resolución, las líneas de velocidad y el contador de FPS.
 - Se adapta a **1366×768, 1920×1080, 2560×1440** y a pantallas **ultrapanorámicas**.
+- **Pocas llamadas de dibujo**: cada kart con su piloto es una sola malla animada por huesos y la
+  decoración estática de cada circuito se agrupa por material y zona al cargarlo (de unas 300
+  llamadas por frame a 50–90), algo clave para ir fluido en móviles.
+- Los shaders se compilan durante la pantalla de carga, así que no hay tirones la primera vez que
+  aparece un objeto o un efecto.
 
 ---
 

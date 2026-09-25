@@ -6,6 +6,7 @@ import { PHYSICS } from '../config.js';
 import { KartModel } from '../models/KartModel.js';
 import { CharacterModel } from '../models/CharacterModel.js';
 import { createShieldBubble, createRescueDrone } from '../models/ItemModels.js';
+import { mergeRig, disposeRig } from '../models/RigMerger.js';
 import { clamp, damp, lerpAngle } from '../core/MathUtils.js';
 import { TextureFactory } from './TextureFactory.js';
 
@@ -16,6 +17,7 @@ const _m = new THREE.Matrix4();
 const _q = new THREE.Quaternion();
 const _qa = new THREE.Quaternion();
 const _pos = new THREE.Vector3();
+const _scale1 = new THREE.Vector3(1, 1, 1);
 
 export class KartVisual {
   constructor(kart, scene, opts = {}) {
@@ -33,34 +35,29 @@ export class KartVisual {
     this.character.root.position.copy(this.model.seat);
     this.model.body.add(this.character.root);
     scene.add(this.root);
+    this.ghost = !!opts.ghost;
+    // Kart y piloto en una sola malla con esqueleto (1-2 llamadas de dibujo en vez de ~30)
+    this.rig = mergeRig(this.root, { ghost: this.ghost, parent: this.body });
 
     this.shield = createShieldBubble();
     this.shield.visible = false;
     this.root.add(this.shield);
 
+    const fx = effectResources();
     this.aura = new THREE.Mesh(
-      new THREE.SphereGeometry(1.8, 20, 14),
+      fx.auraGeo,
       new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false }),
     );
     this.aura.position.y = 0.7;
     this.aura.visible = false;
     this.root.add(this.aura);
 
-    this.ice = new THREE.Mesh(
-      new THREE.BoxGeometry(2.2, 1.8, 2.8),
-      new THREE.MeshStandardMaterial({ color: '#b3e5fc', transparent: true, opacity: 0.45, roughness: 0.05, metalness: 0.1, emissive: new THREE.Color('#4fc3f7'), emissiveIntensity: 0.4, depthWrite: false }),
-    );
+    this.ice = new THREE.Mesh(fx.iceGeo, fx.iceMat);
     this.ice.position.y = 0.8;
     this.ice.visible = false;
     this.body.add(this.ice);
 
-    const cometGeo = new THREE.ConeGeometry(1.6, 6, 18, 1, true);
-    cometGeo.rotateX(-Math.PI / 2);
-    cometGeo.translate(0, 0, -1.8);
-    this.cometShell = new THREE.Mesh(
-      cometGeo,
-      new THREE.MeshBasicMaterial({ color: new THREE.Color('#ff9100').multiplyScalar(2), transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }),
-    );
+    this.cometShell = new THREE.Mesh(fx.cometGeo, fx.cometMat);
     this.cometShell.position.y = 0.7;
     this.cometShell.visible = false;
     this.root.add(this.cometShell);
@@ -69,18 +66,11 @@ export class KartVisual {
     this.drone.visible = false;
     scene.add(this.drone);
 
-    this.blob = null;
-    if (opts.blobShadow) {
-      this.blob = new THREE.Mesh(
-        new THREE.PlaneGeometry(2.6, 3.2),
-        new THREE.MeshBasicMaterial({ map: TextureFactory.softDot(), color: '#000000', transparent: true, opacity: 0.45, depthWrite: false }),
-      );
-      this.blob.rotation.x = -Math.PI / 2;
-      this.blob.renderOrder = 1;
-      scene.add(this.blob);
-    }
+    // Sombra circular compartida (una sola malla instanciada para todos los karts)
+    this.blobs = opts.blobs || null;
+    this.blobIndex = opts.blobIndex ?? kart.index;
+    this._hit = {};
 
-    this.ghost = !!opts.ghost;
     if (this.ghost) this.makeGhost();
 
     this.driftVis = 0;
@@ -93,7 +83,7 @@ export class KartVisual {
 
   makeGhost() {
     this.root.traverse((o) => {
-      if (o.isMesh) {
+      if (o.isMesh && !o.userData.rig) {
         o.material = o.material.clone();
         o.material.transparent = true;
         o.material.opacity = 0.38;
@@ -217,14 +207,10 @@ export class KartVisual {
     const blink = (k.invincible > 0 && !k.stun.type && k.starTime <= 0 && k.comet <= 0 && k.ghostTime > 0) || (r.active && r.phase === 'carry');
     this.body.visible = !blink || Math.sin(time * 40) > -0.2;
 
-    if (this.blob) {
-      const hit = race.track.collision.groundAt(pos.x, pos.z, pos.y + 1, {});
-      this.blob.visible = hit.hit && pos.y - hit.y < 8 && !hidden;
-      if (this.blob.visible) {
-        this.blob.position.set(pos.x, hit.y + 0.05, pos.z);
-        this.blob.rotation.z = -yaw;
-        this.blob.material.opacity = 0.45 * clamp(1 - (pos.y - hit.y) / 8, 0, 1);
-      }
+    if (this.blobs) {
+      const hit = race.track.collision.groundAt(pos.x, pos.z, pos.y + 1, this._hit);
+      if (hit.hit && pos.y - hit.y < 8 && !hidden) this.blobs.set(this.blobIndex, pos.x, hit.y + 0.05, pos.z, yaw, 0.45 * clamp(1 - (pos.y - hit.y) / 8, 0, 1));
+      else this.blobs.hide(this.blobIndex);
     }
   }
 
@@ -252,11 +238,73 @@ export class KartVisual {
   }
 
   dispose() {
+    disposeRig(this.rig);
     this.model.dispose();
     this.character.dispose();
     this.root.removeFromParent();
     this.drone.removeFromParent();
-    if (this.blob) this.blob.removeFromParent();
+  }
+}
+
+/** Geometrías y materiales de los efectos de estado, compartidos por todos los karts. */
+let fxShared = null;
+function effectResources() {
+  if (fxShared) return fxShared;
+  const cometGeo = new THREE.ConeGeometry(1.6, 6, 18, 1, true);
+  cometGeo.rotateX(-Math.PI / 2);
+  cometGeo.translate(0, 0, -1.8);
+  fxShared = {
+    auraGeo: new THREE.SphereGeometry(1.8, 20, 14),
+    iceGeo: new THREE.BoxGeometry(2.2, 1.8, 2.8),
+    iceMat: new THREE.MeshStandardMaterial({ color: '#b3e5fc', transparent: true, opacity: 0.45, roughness: 0.05, metalness: 0.1, emissive: new THREE.Color('#4fc3f7'), emissiveIntensity: 0.4, depthWrite: false }),
+    cometGeo,
+    cometMat: new THREE.MeshBasicMaterial({ color: new THREE.Color('#ff9100').multiplyScalar(2), transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }),
+  };
+  for (const k of ['auraGeo', 'iceGeo', 'cometGeo']) fxShared[k].userData.shared = true;
+  for (const k of ['iceMat', 'cometMat']) fxShared[k].userData.shared = true;
+  return fxShared;
+}
+
+/** Sombras circulares bajo los karts (sin sombras reales): todas en una sola llamada de dibujo. */
+export class BlobShadows {
+  constructor(scene, count) {
+    const mat = new THREE.MeshBasicMaterial({ map: TextureFactory.softDot(), color: '#000000', transparent: true, depthWrite: false });
+    // la opacidad de cada sombra viaja en el canal rojo del color por instancia
+    mat.onBeforeCompile = (shader) => {
+      shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>\n\tdiffuseColor.a *= vColor.r;');
+    };
+    mat.customProgramCacheKey = () => 'kartopia-blob-shadows';
+    const geo = new THREE.PlaneGeometry(2.6, 3.2);
+    geo.rotateX(-Math.PI / 2);
+    this.mesh = new THREE.InstancedMesh(geo, mat, count);
+    this.mesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(count * 3), 3);
+    this.mesh.frustumCulled = false;
+    this.mesh.renderOrder = 1;
+    this.mesh.name = 'blob-shadows';
+    this.zero = new THREE.Matrix4().makeScale(0, 0, 0);
+    for (let i = 0; i < count; i++) this.mesh.setMatrixAt(i, this.zero);
+    scene.add(this.mesh);
+  }
+
+  set(i, x, y, z, yaw, alpha) {
+    _q.setFromAxisAngle(UP, yaw);
+    _pos.set(x, y, z);
+    _m.compose(_pos, _q, _scale1);
+    this.mesh.setMatrixAt(i, _m);
+    this.mesh.instanceColor.setX(i, alpha);
+    this.mesh.instanceMatrix.needsUpdate = true;
+    this.mesh.instanceColor.needsUpdate = true;
+  }
+
+  hide(i) {
+    this.mesh.setMatrixAt(i, this.zero);
+    this.mesh.instanceMatrix.needsUpdate = true;
+  }
+
+  dispose() {
+    this.mesh.removeFromParent();
+    this.mesh.geometry.dispose();
+    this.mesh.material.dispose();
   }
 }
 

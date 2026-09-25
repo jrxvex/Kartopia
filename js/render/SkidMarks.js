@@ -33,8 +33,11 @@ export class SkidMarks {
     );
     this.mesh.frustumCulled = false;
     this.mesh.renderOrder = 2;
+    geo.setDrawRange(0, 0);
     scene.add(this.mesh);
     this.cursor = 0;
+    this.written = 0; // quads escritos en total (sin módulo)
+    this.flushed = 0; // hasta dónde se han subido a la GPU
     this.last = new Map(); // clave (kart+rueda) → último punto
   }
 
@@ -56,6 +59,7 @@ export class SkidMarks {
       }
       const q = this.cursor;
       this.cursor = (this.cursor + 1) % MAX_QUADS;
+      this.written++;
       const o = q * 12;
       const P = this.pos;
       P[o] = prev.x - prev.lx;
@@ -77,20 +81,43 @@ export class SkidMarks {
         this.col[c + k * 4 + 2] = color[2];
         this.col[c + k * 4 + 3] = alpha;
       }
-      this.dirty = true;
     }
-    this.last.set(key, { x: px, y: py, z: pz, lx, lz });
+    if (prev) {
+      prev.x = px;
+      prev.y = py;
+      prev.z = pz;
+      prev.lx = lx;
+      prev.lz = lz;
+    } else this.last.set(key, { x: px, y: py, z: pz, lx, lz });
   }
 
   break(key) {
     this.last.delete(key);
   }
 
+  /** Sube a la GPU solo los quads nuevos desde el último frame (no el búfer entero). */
   update() {
-    if (!this.dirty) return;
-    this.dirty = false;
+    const n = this.written - this.flushed;
+    if (n <= 0) return;
+    this.flushed = this.written;
+    this.aPos.clearUpdateRanges();
+    this.aCol.clearUpdateRanges();
+    const range = (q, count) => {
+      this.aPos.addUpdateRange(q * 12, count * 12);
+      this.aCol.addUpdateRange(q * 16, count * 16);
+    };
+    if (n >= MAX_QUADS) range(0, MAX_QUADS);
+    else {
+      const a = (this.written - n) % MAX_QUADS;
+      if (a + n <= MAX_QUADS) range(a, n);
+      else {
+        range(a, MAX_QUADS - a);
+        range(0, a + n - MAX_QUADS);
+      }
+    }
     this.aPos.needsUpdate = true;
     this.aCol.needsUpdate = true;
+    this.mesh.geometry.setDrawRange(0, Math.min(this.written, MAX_QUADS) * 6);
   }
 
   dispose() {

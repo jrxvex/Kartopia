@@ -1,4 +1,5 @@
-// Efecto de velocidad: líneas radiales en un canvas 2D superpuesto (muy barato de dibujar).
+// Efecto de velocidad: líneas radiales en un canvas 2D superpuesto (muy barato de dibujar) y una
+// viñeta que es una capa CSS fija: solo cambia su opacidad, que la GPU compone sin repintar.
 import { Random } from '../core/Random.js';
 
 export class SpeedLines {
@@ -11,8 +12,21 @@ export class SpeedLines {
     this.lines = [];
     for (let i = 0; i < 70; i++) this.lines.push(this.newLine());
     this.visible = false;
+    this.maxDpr = 1.5;
+    this.vignette = document.createElement('div');
+    this.vignette.className = 'fx-vignette';
+    canvas.after(this.vignette);
+    this.vigOpacity = '0';
     this.resize();
     window.addEventListener('resize', () => this.resize());
+  }
+
+  /** En calidad baja el lienzo se dibuja a resolución CSS (menos píxeles que limpiar y trazar). */
+  setQuality(low) {
+    const max = low ? 1 : 1.5;
+    if (max === this.maxDpr) return;
+    this.maxDpr = max;
+    this.resize();
   }
 
   newLine() {
@@ -26,7 +40,7 @@ export class SpeedLines {
   }
 
   resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const dpr = Math.min(window.devicePixelRatio || 1, this.maxDpr);
     this.canvas.width = Math.floor(window.innerWidth * dpr);
     this.canvas.height = Math.floor(window.innerHeight * dpr);
     this.dpr = dpr;
@@ -38,6 +52,11 @@ export class SpeedLines {
     const ctx = this.ctx;
     const W = this.canvas.width;
     const H = this.canvas.height;
+    const vig = this.intensity < 0.02 ? '0' : (Math.round(Math.min(0.35, this.intensity * 0.3) * 50) / 50).toString();
+    if (vig !== this.vigOpacity) {
+      this.vigOpacity = vig;
+      this.vignette.style.opacity = vig;
+    }
     if (this.intensity < 0.02) {
       if (this.visible) {
         ctx.clearRect(0, 0, W, H);
@@ -68,17 +87,13 @@ export class SpeedLines {
       ctx.lineTo(cx + ca * r1, cy + sa * r1 * 0.75);
       ctx.stroke();
     }
-    // viñeta suave
-    const g = ctx.createRadialGradient(cx, cy, R * 0.45, cx, cy, R);
-    g.addColorStop(0, 'rgba(0,0,0,0)');
-    g.addColorStop(1, `rgba(0,0,0,${Math.min(0.35, this.intensity * 0.3)})`);
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
   }
 
   clear() {
     this.intensity = 0;
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.visible = false;
+    this.vigOpacity = '0';
+    this.vignette.style.opacity = '0';
   }
 }

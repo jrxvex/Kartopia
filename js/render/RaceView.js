@@ -7,9 +7,10 @@ import { Sky } from './Sky.js';
 import { ParticleManager } from './ParticleManager.js';
 import { SkidMarks } from './SkidMarks.js';
 import { CameraController } from './CameraController.js';
-import { KartVisual } from './KartVisual.js';
+import { KartVisual, BlobShadows } from './KartVisual.js';
+import { shareSkeleton } from '../models/RigMerger.js';
 import { TrackRenderer } from '../track/TrackRenderer.js';
-import { ItemBoxesMesh, createItemMesh } from '../models/ItemModels.js';
+import { ItemBoxesMesh, createItemMesh, ITEM_VISUALS } from '../models/ItemModels.js';
 import { surfaceDef, SURFACE } from '../physics/Surfaces.js';
 import { DRIFT_COLORS } from './ParticleManager.js';
 import { GhostPlayer } from '../race/Ghost.js';
@@ -50,12 +51,14 @@ export class RaceView {
 
     this.particles = new ParticleManager(this.scene, preset.particles);
     this.skids = new SkidMarks(this.scene);
-    const blob = !this.settings.shadows;
-    this.visuals = race.karts.map((k) => {
-      const v = new KartVisual(k, this.scene, { blobShadow: blob });
+    this.blobs = this.settings.shadows ? null : new BlobShadows(this.scene, race.karts.length);
+    this.visuals = race.karts.map((k, i) => {
+      const v = new KartVisual(k, this.scene, { blobs: this.blobs, blobIndex: i });
       k.visual = v;
       return v;
     });
+    // Un solo esqueleto (una textura de huesos) para todos los karts
+    shareSkeleton(this.visuals.map((v) => v.rig));
     this.itemBoxes = race.items.boxes.length ? new ItemBoxesMesh(race.items.boxes.length) : null;
     if (this.itemBoxes) this.scene.add(this.itemBoxes.group);
     this.entityMeshes = new Map();
@@ -135,6 +138,51 @@ export class RaceView {
     } catch (e) {
       console.warn('[RaceView] sin mapa de entorno', e);
     }
+  }
+
+  /**
+   * Compila y usa una vez todos los shaders que pueden aparecer en la carrera (objetos, escudos,
+   * turbos, partículas...) mientras se ve la pantalla de carga: así no hay tirones la primera vez
+   * que aparecen (en iOS cada compilación puede congelar la imagen un buen rato).
+   */
+  warmup() {
+    const r = this.renderer;
+    const cam = this.camera;
+    cam.updateMatrixWorld();
+    const tmp = new THREE.Group();
+    ITEM_VISUALS.forEach((t, i) => {
+      const m = createItemMesh(t);
+      m.position.set((i - ITEM_VISUALS.length / 2) * 1.6, -0.5, -7);
+      tmp.add(m);
+    });
+    tmp.position.copy(cam.position);
+    tmp.quaternion.copy(cam.quaternion);
+    this.scene.add(tmp);
+    const shown = [];
+    const visuals = this.ghost ? [...this.visuals, this.ghost.visual] : this.visuals;
+    for (const v of visuals) {
+      for (const o of [v.shield, v.aura, v.ice, v.cometShell, v.drone, ...v.model.flames]) {
+        if (o && !o.visible) {
+          o.visible = true;
+          shown.push(o);
+        }
+      }
+    }
+    _v.set(0, 0, -6).applyQuaternion(cam.quaternion).add(cam.position);
+    this.particles.burst({ count: 6, pos: _v, color: '#ffffff', additive: true });
+    this.particles.burst({ count: 6, pos: _v, color: '#ffffff' });
+    this.particles.update(0.001);
+    try {
+      r.renderer.compile(this.scene, cam);
+      r.render();
+    } catch (e) {
+      console.warn('[RaceView] precalentado de shaders', e);
+    }
+    this.scene.remove(tmp);
+    for (const o of shown) o.visible = false;
+    this.particles.clear();
+    this.particles.update(0);
+    r.render();
   }
 
   setGhost(ghostData, data) {
@@ -430,15 +478,17 @@ export class RaceView {
   dispose() {
     if (this.offs) for (const off of this.offs) off();
     for (const v of this.visuals) v.dispose();
+    if (this.blobs) this.blobs.dispose();
     if (this.ghost) this.ghost.visual.dispose();
     this.particles.dispose();
     this.skids.dispose();
     if (this.itemBoxes) this.itemBoxes.dispose();
     this.materials.dispose();
+    this.trackRenderer.dispose();
     this.sky.dispose();
     if (this.envRT) this.envRT.dispose();
     this.scene.traverse((o) => {
-      if (o.isMesh || o.isInstancedMesh) {
+      if ((o.isMesh || o.isInstancedMesh) && !o.geometry?.userData.shared) {
         o.geometry?.dispose?.();
       }
     });

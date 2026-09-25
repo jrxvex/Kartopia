@@ -25,6 +25,25 @@ function toTexture(c, { srgb = true, repeat = true, aniso = true } = {}) {
   return t;
 }
 
+function drawNeonSign(ctx, text, color, x, y, w, h) {
+  ctx.fillStyle = '#0a0612';
+  ctx.fillRect(x, y, w, h);
+  ctx.font = `${Math.floor(h * 0.48)}px "Lilita One", "Arial Black", sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 24;
+  ctx.lineWidth = 6;
+  ctx.strokeStyle = color;
+  ctx.strokeText(text, x + w / 2, y + h / 2, w - 36);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(text, x + w / 2, y + h / 2, w - 36);
+  ctx.shadowBlur = 24;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 8;
+  ctx.strokeRect(x + 10, y + 10, w - 20, h - 20);
+}
+
 function cached(key, fn) {
   if (!cache.has(key)) cache.set(key, fn());
   return cache.get(key);
@@ -503,24 +522,29 @@ export const TextureFactory = {
   neonSign(text, color = '#ff4081', w = 512, h = 192) {
     return cached(`neon:${text}:${color}`, () => {
       const c = makeCanvas(w, h);
-      const ctx = c.getContext('2d');
-      ctx.fillStyle = '#0a0612';
-      ctx.fillRect(0, 0, w, h);
-      ctx.font = `${Math.floor(h * 0.48)}px "Lilita One", "Arial Black", sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.shadowColor = color;
-      ctx.shadowBlur = 24;
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = color;
-      ctx.strokeText(text, w / 2, h / 2);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText(text, w / 2, h / 2);
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 8;
-      ctx.strokeRect(10, 10, w - 20, h - 20);
+      drawNeonSign(c.getContext('2d'), text, color, 0, 0, w, h);
       return toTexture(c, { repeat: false });
     });
+  },
+
+  /**
+   * Atlas con varios rótulos luminosos (una sola textura → una sola llamada de dibujo para todos).
+   * Devuelve la textura y, para cada rótulo, su rectángulo UV [u0, v0, u1, v1].
+   */
+  signAtlas(signs, w = 512, h = 192) {
+    const cols = signs.length > 1 ? 2 : 1;
+    const rows = Math.ceil(signs.length / cols);
+    const c = makeCanvas(w * cols, h * rows);
+    const ctx = c.getContext('2d');
+    const rects = signs.map((sg, i) => {
+      const x = (i % cols) * w;
+      const y = Math.floor(i / cols) * h;
+      ctx.save();
+      drawNeonSign(ctx, sg.text, sg.color, x, y, w, h);
+      ctx.restore();
+      return [x / c.width, 1 - (y + h) / c.height, (x + w) / c.width, 1 - y / c.height];
+    });
+    return { texture: toTexture(c, { repeat: false }), rects };
   },
 
   /** Rejilla luminosa (suelo del vacío digital). */
